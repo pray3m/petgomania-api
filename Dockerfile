@@ -13,6 +13,9 @@ RUN yarn install
 # Copy the rest of the source code to /app
 COPY . .
 
+# Set NODE_ENV to production
+ENV NODE_ENV=production
+
 # Expose port 5001 for the API
 EXPOSE 5001
 

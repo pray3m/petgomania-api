@@ -1,15 +1,18 @@
 version: "3.8"
 
 services:
-  server:
-    build: .
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: petgomania-api
     ports:
       - "5001:5001" # Expose API on port 5001
-    environment:
-      - NODE_ENV=production
+    env_file:
+      - .env # Load environment variables from the .env file
+    restart: always
     networks:
-      - app-network
+      - app-network # Use a network to connect with other services
 
 networks:
   app-network:
