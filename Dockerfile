@@ -12,8 +12,8 @@ RUN yarn install
 # Copy the source code to /app
 COPY . .
 
-# Expose the port your Node.js server runs on (e.g., 5000)
-EXPOSE 5000
+# Expose the port your Node.js server runs on (e.g., 5001)
+EXPOSE 5001
 
 # Start the server using Yarn
 CMD ["yarn", "start"]
