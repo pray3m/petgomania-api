@@ -2,9 +2,9 @@
 
 ## Database Schema Overview
 
-This document outlines the database schema for the Petgomania platform using **Mermaid** syntax. The schema consists of the following key entities: **Users**, **Roles**, **Products**, **Pets**, **Orders**, **Adoptions**, **Messages**, and **Conversations**.
+This document outlines the database schema for the Petgomania platform. The schema consists of the following key entities: **Users**, **Roles**, **Products**, **Pets**, **Orders**, **Adoptions**, **Messages**, and **Conversations**.
 
-### Final Database Schema Diagram
+### Database Schema Diagram
 
 ```mermaid
 erDiagram
@@ -89,3 +89,4 @@ erDiagram
     PETS ||--o{ ADOPTIONS : "can have"
     PRODUCTS ||--o{ ORDERS : "can have"
     CONVERSATIONS ||--o{ MESSAGES : "can have"
+```
