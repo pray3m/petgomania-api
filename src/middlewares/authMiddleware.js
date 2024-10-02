@@ -1,10 +1,9 @@
-const jwt = require("jsonwebtoken");
+import prisma from "../config/db.js";
+import jwt from "jsonwebtoken";
 
-module.exports = (req, res, next) => {
-  // Get token from headers
-  const authHeader = req.headers.authorization;
+export const authenticateToken = async (req, res, next) => {
+  const authHeader = req.headers["authorization"];
 
-  // Check if token exists
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res
       .status(401)
@@ -14,18 +13,26 @@ module.exports = (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
   try {
-    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Attach user to request
-    req.user = {
-      id: decoded.userId,
-      role: decoded.role,
-    };
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+    });
+
+    if (!user) return res.status(401).json({ error: "User no longer exists." });
+
+    req.user = user;
 
     next();
   } catch (error) {
-    console.error("Token verification error:", error);
     res.status(401).json({ error: "Token is invalid or expired." });
   }
+};
+
+export const authorizeAdmin = (req, res, next) => {
+  if (req.user.role !== "ADMIN") {
+    return res.status(403).json({ error: "Access denied. Admins only." });
+  }
+
+  next();
 };
