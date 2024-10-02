@@ -11,14 +11,25 @@ app.use(cors());
 app.use(morgan("dev"));
 
 // Routes
-app.get("/", (req, res) => {
-  res.send("Welcome to the PetGoMania API 🚀!");
-});
+import router from "./routes/index.js";
+app.use("/", router);
 
-import authRoutes from "./routes/authRoutes.js";
-app.use("/auth", authRoutes);
+// 404 Handler
+app.use((req, res, next) => {
+  res.status(404).json({ error: "Not Found" });
+});
 
 import errorHandler from "./middlewares/errorHandler.js";
 app.use(errorHandler);
+
+// Handle Uncaught Exceptions and Rejections
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+  process.exit(1);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+});
 
 export default app;

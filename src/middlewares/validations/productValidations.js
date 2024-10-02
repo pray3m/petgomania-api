@@ -1,0 +1,58 @@
+import { body, param } from "express-validator";
+
+// Create Product Validation
+export const createProductValidation = [
+  body("name").trim().notEmpty().withMessage("Product name is required."),
+  body("description")
+    .trim()
+    .notEmpty()
+    .withMessage("Product description is required."),
+  body("price")
+    .isFloat({ gt: 0 })
+    .withMessage("Price must be a positive number."),
+  body("category").trim().notEmpty().withMessage("Category is required."),
+  body("stock")
+    .isInt({ min: 0 })
+    .withMessage("Stock must be a non-negative integer."),
+  body("imageUrl")
+    .optional()
+    .isURL()
+    .withMessage("Image URL must be a valid URL."),
+];
+
+// Update Product Validation
+export const updateProductValidation = [
+  param("id").isInt().withMessage("Product ID must be an integer."),
+  body("name")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("Product name cannot be empty."),
+  body("description")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("Product description cannot be empty."),
+  body("price")
+    .optional()
+    .isFloat({ gt: 0 })
+    .withMessage("Price must be a positive number."),
+  body("category")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("Category cannot be empty."),
+  body("stock")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage("Stock must be a non-negative integer."),
+  body("imageUrl")
+    .optional()
+    .isURL()
+    .withMessage("Image URL must be a valid URL."),
+];
+
+// Delete Product Validation
+export const deleteProductValidation = [
+  param("id").isInt().withMessage("Product ID must be an integer."),
+];
