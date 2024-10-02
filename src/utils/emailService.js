@@ -10,12 +10,12 @@ const transporter = createTransport({
   },
 });
 
-export const sendEmail = async (to, subject, message) => {
+export const sendEmail = async (to, subject, html) => {
   const mailOptions = {
     from: process.env.EMAIL_FROM,
     to,
     subject,
-    html: message,
+    html,
   };
 
   await transporter.sendMail(mailOptions);

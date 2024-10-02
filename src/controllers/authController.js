@@ -1,9 +1,14 @@
 import bcrypt from "bcryptjs";
-import prisma from "../config/db.js";
 import { validationResult } from "express-validator";
-import crypto from "crypto";
-import { sendEmail } from "../utils/emailService.js";
 import jwt from "jsonwebtoken";
+import prisma from "../config/db.js";
+import { sendEmail } from "../utils/emailService.js";
+import {
+  generateOtp,
+  handleErrorResponse,
+  sendOtpEmail,
+} from "../utils/helpers.js";
+import { registerUser } from "../services/authService.js";
 
 export const register = async (req, res) => {
   const errors = validationResult(req);
@@ -13,58 +18,15 @@ export const register = async (req, res) => {
 
   const { name, email, password, role } = req.body;
   try {
-    // check if user exists
-    let user = await prisma.user.findUnique({ where: { email } });
-    if (user) {
-      return res.status(400).json({ msg: "User already exists" });
-    }
+    await registerUser({ name, email, password, role });
 
-    const salt = await bcrypt.genSalt(10);
-    const hasedPassword = await bcrypt.hash(password, salt);
-
-    // Generate OTP
-    const otpCode = crypto.randomInt(100000, 999999).toString();
-    const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // Expires in 15 minutes
-
-    user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hasedPassword,
-        role, // default role is user
-        otpCode,
-        otpExpiresAt,
-        isVerified: false,
-      },
-    });
-
-    const emailSubject = "Verify Your Petgomania Account";
-    const emailBody = `
-      <p>Hi ${name},</p>
-      <p>Thank you for registering at Petgomania!</p>
-      <p>Your verification code is: <strong>${otpCode}</strong></p>
-      <p>This code will expire in 15 minutes.</p>
-      <p>If you did not sign up for this account, please ignore this email.</p>
-      <p>Best regards,<br>Petgomania Team</p>
-    `;
-
-    await sendEmail(email, emailSubject, emailBody);
-
-    // Return success message
     res.status(201).json({
       message:
         "Registration successful. Please check your email to verify your account.",
     });
-
-    // const payload = { userId: user.id, role: user.role };
-    // const token = jwt.sign(payload, process.env.JWT_SECRET, {
-    //   expiresIn: "1d",
-    // });
-
-    // res.status(201).json({ token });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server error");
+  } catch (error) {
+    console.error(error.message);
+    handleErrorResponse(res, 400, error.message);
   }
 };
 
@@ -144,7 +106,7 @@ export const resendOtp = async (req, res) => {
     }
 
     // Generate new OTP
-    const otpCode = crypto.randomInt(100000, 999999).toString();
+    const otpCode = generateOtp();
     const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // Expires in 15 minutes
 
     // Update user with new OTP and reset attempts
