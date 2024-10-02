@@ -1,8 +1,9 @@
+import cors from "cors";
 import express from "express";
 import morgan from "morgan";
-import cors from "cors";
 
 const app = express();
+app.use(express.json());
 
 // Middleware
 app.use(cors());
@@ -12,5 +13,11 @@ app.use(morgan("dev"));
 app.get("/", (req, res) => {
   res.send("Welcome to the PetGoMania API 🚀!");
 });
+
+import authRoutes from "./routes/authRoutes.js";
+app.use("/auth", authRoutes);
+
+import errorHandler from "./middlewares/errorHandler.js";
+app.use(errorHandler);
 
 export default app;
