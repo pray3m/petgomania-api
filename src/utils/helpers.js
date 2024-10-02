@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { sendEmail } from "./emailService";
+import { sendEmail } from "./emailService.js";
 
 export const generateOtp = () => {
   return crypto.randomInt(100000, 999999).toString();
