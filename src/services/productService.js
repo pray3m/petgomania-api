@@ -1,4 +1,6 @@
+import cloudinary from "../config/cloudinary.js";
 import prisma from "../config/db.js";
+import { allowedCategories } from "../utils/constants.js";
 
 export const createProductService = async ({
   name,
@@ -80,4 +82,54 @@ export const getProductByIdService = async (id) => {
     where: { id },
   });
   return product;
+};
+
+export const updateProductService = async (id, data) => {
+  try {
+    if (data.category && !allowedCategories.includes(data.category)) {
+      throw new Error("Invalid category");
+    }
+
+    if (data.imageUrl) {
+      const existingProduct = await prisma.product.findUnique({
+        where: { id },
+      });
+
+      if (!existingProduct) {
+        return null;
+      }
+
+      if (existingProduct.imageUrl) {
+        // Extract the public ID from the existing imageUrl to delete it from Cloudinary
+        // Example imageUrl: https://res.cloudinary.com/<cloud_name>/image/upload/v1600000000/petgomania/products/image-name.jpg
+        const segments = existingProduct.imageUrl.split("/");
+        const imageNameWithExtension = segments[segments.length - 1];
+        const imageName = imageNameWithExtension.split(".")[0]; // Remove file extension
+        const publicId = `petgomania/products/${imageName}`;
+
+        // Delete the old image from Cloudinary
+        await cloudinary.uploader.destroy(publicId);
+      }
+    }
+
+    const updatedProduct = await prisma.product.update({
+      where: { id },
+      data: {
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        category: data.category,
+        stock: data.stock,
+        imageUrl: data.imageUrl, // This will be null if not provided
+      },
+    });
+
+    return updatedProduct;
+  } catch (error) {
+    if (error.code === "P2025") {
+      // Record not found
+      return null;
+    }
+    throw error;
+  }
 };

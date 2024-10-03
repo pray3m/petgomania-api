@@ -1,4 +1,5 @@
 import { body, param, query } from "express-validator";
+import { allowedCategories } from "../../utils/constants.js";
 
 export const getAllProductsValidation = [
   [
@@ -27,15 +28,6 @@ export const getAllProductsValidation = [
       .isString()
       .withMessage("Search must be a string."),
   ],
-];
-
-// Create Product Validation
-const allowedCategories = [
-  "food",
-  "toys",
-  "accessories",
-  "healthcare",
-  "grooming",
 ];
 
 export const createProductValidation = [
