@@ -3,6 +3,7 @@ import {
   createProduct,
   getAllProducts,
   getProductById,
+  updateProduct,
 } from "../controllers/productController.js";
 import {
   authenticateToken,
@@ -12,8 +13,10 @@ import { handleValidationErrors } from "../middlewares/validations/handleValidat
 import {
   createProductValidation,
   getAllProductsValidation,
+  getProductByIdValidation,
+  updateProductValidation,
 } from "../middlewares/validations/productValidations.js";
-import { param } from "express-validator";
+import parser from "../middlewares/upload.js";
 
 const router = Router();
 
@@ -27,7 +30,7 @@ router.get(
 
 router.get(
   "/:id",
-  [param("id").isInt().withMessage("Product ID must be an integer.")],
+  getProductByIdValidation,
   handleValidationErrors,
   getProductById
 );
@@ -37,9 +40,20 @@ router.post(
   "/",
   authenticateToken,
   authorizeAdmin,
+  parser.single("image"),
   createProductValidation,
   handleValidationErrors,
   createProduct
+);
+
+router.put(
+  "/:id",
+  authenticateToken,
+  authorizeAdmin,
+  parser.single("image"),
+  updateProductValidation,
+  handleValidationErrors,
+  updateProduct
 );
 
 // // Update a product by ID

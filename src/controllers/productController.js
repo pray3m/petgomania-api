@@ -47,3 +47,13 @@ export const getProductById = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description, price, category, stock } = req.body;
+  } catch (error) {
+    console.error("Update product error", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

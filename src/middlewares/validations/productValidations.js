@@ -57,6 +57,10 @@ export const createProductValidation = [
     .withMessage("Image URL must be a valid URL."),
 ];
 
+export const getProductByIdValidation = [
+  param("id").isInt().withMessage("Product ID must be an integer."),
+];
+
 // Update Product Validation
 export const updateProductValidation = [
   param("id").isInt().withMessage("Product ID must be an integer."),
@@ -76,9 +80,8 @@ export const updateProductValidation = [
     .withMessage("Price must be a positive number."),
   body("category")
     .optional()
-    .trim()
-    .notEmpty()
-    .withMessage("Category cannot be empty."),
+    .isIn(allowedCategories)
+    .withMessage("Category is invalid."),
   body("stock")
     .optional()
     .isInt({ min: 0 })
