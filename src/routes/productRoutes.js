@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createProduct,
   getAllProducts,
+  getProductById,
 } from "../controllers/productController.js";
 import {
   authenticateToken,
@@ -12,6 +13,7 @@ import {
   createProductValidation,
   getAllProductsValidation,
 } from "../middlewares/validations/productValidations.js";
+import { param } from "express-validator";
 
 const router = Router();
 
@@ -23,7 +25,12 @@ router.get(
   getAllProducts
 );
 
-// router.get("/:id", getProductById);
+router.get(
+  "/:id",
+  [param("id").isInt().withMessage("Product ID must be an integer.")],
+  handleValidationErrors,
+  getProductById
+);
 
 // Admin Routes
 router.post(

@@ -74,3 +74,10 @@ export const getAllProductsService = async ({
     },
   };
 };
+
+export const getProductByIdService = async (id) => {
+  const product = await prisma.product.findUnique({
+    where: { id },
+  });
+  return product;
+};
