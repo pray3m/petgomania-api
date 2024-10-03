@@ -1,4 +1,33 @@
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
+
+export const getAllProductsValidation = [
+  [
+    query("page")
+      .optional()
+      .isInt({ min: 1 })
+      .withMessage("Page must be a positive integer."),
+    query("limit")
+      .optional()
+      .isInt({ min: 1 })
+      .withMessage("Limit must be a positive integer."),
+    query("category")
+      .optional()
+      .isString()
+      .withMessage("Category must be a string."),
+    query("sortBy")
+      .optional()
+      .isIn(["name", "price", "createdAt", "updatedAt"])
+      .withMessage("Invalid sortBy field."),
+    query("sortOrder")
+      .optional()
+      .isIn(["asc", "desc"])
+      .withMessage("SortOrder must be 'asc' or 'desc'."),
+    query("search")
+      .optional()
+      .isString()
+      .withMessage("Search must be a string."),
+  ],
+];
 
 // Create Product Validation
 export const createProductValidation = [

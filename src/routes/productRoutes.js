@@ -1,16 +1,28 @@
 import { Router } from "express";
 import {
+  createProduct,
+  getAllProducts,
+} from "../controllers/productController.js";
+import {
   authenticateToken,
   authorizeAdmin,
 } from "../middlewares/authMiddleware.js";
-import { createProductValidation } from "../middlewares/validations/productValidations.js";
-import { createProduct } from "../controllers/productController.js";
 import { handleValidationErrors } from "../middlewares/validations/handleValidationErrors.js";
+import {
+  createProductValidation,
+  getAllProductsValidation,
+} from "../middlewares/validations/productValidations.js";
 
 const router = Router();
 
 // Public Routes
-// router.get("/", getAllProducts);
+router.get(
+  "/",
+  getAllProductsValidation,
+  handleValidationErrors,
+  getAllProducts
+);
+
 // router.get("/:id", getProductById);
 
 // Admin Routes
@@ -22,17 +34,6 @@ router.post(
   handleValidationErrors,
   createProduct
 );
-
-// //Get all products
-// router.get("/", getProducts);
-
-// // Get a single product by ID
-// router.get(
-//   "/:id",
-//   [param("id").isInt().withMessage("Product ID must be an integer.")],
-//   handleValidationErrors,
-//   getProductById
-// );
 
 // // Update a product by ID
 // router.put(
