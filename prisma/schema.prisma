@@ -36,6 +36,14 @@ enum PetHealthStatus {
   RECOVERING
 }
 
+enum ProductCategory {
+  food
+  toys
+  accessories
+  healthcare
+  grooming
+}
+
 // 1. User Model
 model User {
   id           Int       @id @default(autoincrement())
@@ -63,20 +71,18 @@ model User {
 
 // 2. Product Model
 model Product {
-  id          Int      @id @default(autoincrement())
+  id          Int             @id @default(autoincrement())
   name        String
   description String
   price       Float
-  category    String
+  category    ProductCategory
   stock       Int
   imageUrl    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 
   // Relationships
   orders Order[]
-
-  @@index([category])
 }
 
 // 3. Pet Model

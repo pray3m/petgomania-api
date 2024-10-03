@@ -30,6 +30,14 @@ export const getAllProductsValidation = [
 ];
 
 // Create Product Validation
+const allowedCategories = [
+  "food",
+  "toys",
+  "accessories",
+  "healthcare",
+  "grooming",
+];
+
 export const createProductValidation = [
   body("name").trim().notEmpty().withMessage("Product name is required."),
   body("description")
@@ -39,7 +47,7 @@ export const createProductValidation = [
   body("price")
     .isFloat({ gt: 0 })
     .withMessage("Price must be a positive number."),
-  body("category").trim().notEmpty().withMessage("Category is required."),
+  body("category").isIn(allowedCategories).withMessage("Invalid category."),
   body("stock")
     .isInt({ min: 0 })
     .withMessage("Stock must be a non-negative integer."),
