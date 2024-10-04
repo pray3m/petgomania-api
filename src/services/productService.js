@@ -1,6 +1,7 @@
 import cloudinary from "../config/cloudinary.js";
 import prisma from "../config/db.js";
 import { allowedCategories } from "../utils/constants.js";
+import { extractPublicId } from "../utils/helpers.js";
 
 export const createProductService = async ({
   name,
@@ -100,14 +101,7 @@ export const updateProductService = async (id, data) => {
       }
 
       if (existingProduct.imageUrl) {
-        // Extract the public ID from the existing imageUrl to delete it from Cloudinary
-        // Example imageUrl: https://res.cloudinary.com/<cloud_name>/image/upload/v1600000000/petgomania/products/image-name.jpg
-        const segments = existingProduct.imageUrl.split("/");
-        const imageNameWithExtension = segments[segments.length - 1];
-        const imageName = imageNameWithExtension.split(".")[0]; // Remove file extension
-        const publicId = `petgomania/products/${imageName}`;
-
-        // Delete the old image from Cloudinary
+        const publicId = extractPublicId(existingProduct.imageUrl);
         await cloudinary.uploader.destroy(publicId);
       }
     }
@@ -130,6 +124,51 @@ export const updateProductService = async (id, data) => {
       // Record not found
       return null;
     }
+    throw error;
+  }
+};
+
+export const deleteProductService = async (id) => {
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id },
+    });
+
+    if (!product) {
+      return false;
+    }
+
+    if (product.imageUrl) {
+      const publicId = extractPublicId(product.imageUrl);
+
+      if (publicId) {
+        const deleteResult = await cloudinary.uploader.destroy(publicId);
+
+        if (
+          deleteResult.result !== "ok" &&
+          deleteResult.result !== "not found"
+        ) {
+          throw new Error(
+            `Failed to delete image from Cloudinary: ${deleteResult.result}`
+          );
+        }
+
+        console.log(`Image with publicId '${publicId}' deleted successfully.`);
+      } else {
+        console.error(
+          "Could not extract publicId from imageUrl:",
+          product.imageUrl
+        );
+      }
+    }
+
+    await prisma.product.delete({
+      where: { id },
+    });
+
+    return true;
+  } catch (error) {
+    console.error("Delete Product Error:", error);
     throw error;
   }
 };

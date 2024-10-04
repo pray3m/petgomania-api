@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createProduct,
+  deleteProduct,
   getAllProducts,
   getProductById,
   updateProduct,
@@ -12,6 +13,7 @@ import {
 import { handleValidationErrors } from "../middlewares/validations/handleValidationErrors.js";
 import {
   createProductValidation,
+  deleteProductValidation,
   getAllProductsValidation,
   getProductByIdValidation,
   updateProductValidation,
@@ -56,49 +58,12 @@ router.put(
   updateProduct
 );
 
-// // Update a product by ID
-// router.put(
-//   "/:id",
-//   [
-//     param("id").isInt().withMessage("Product ID must be an integer."),
-//     body("name")
-//       .optional()
-//       .trim()
-//       .notEmpty()
-//       .withMessage("Product name cannot be empty."),
-//     body("description")
-//       .optional()
-//       .trim()
-//       .notEmpty()
-//       .withMessage("Product description cannot be empty."),
-//     body("price")
-//       .optional()
-//       .isFloat({ gt: 0 })
-//       .withMessage("Price must be a positive number."),
-//     body("category")
-//       .optional()
-//       .trim()
-//       .notEmpty()
-//       .withMessage("Category cannot be empty."),
-//     body("stock")
-//       .optional()
-//       .isInt({ min: 0 })
-//       .withMessage("Stock must be a non-negative integer."),
-//     body("imageUrl")
-//       .optional()
-//       .isURL()
-//       .withMessage("Image URL must be a valid URL."),
-//   ],
-//   handleValidationErrors,
-//   updateProduct
-// );
-
-// // Delete a product by ID
-// router.delete(
-//   "/:id",
-//   [param("id").isInt().withMessage("Product ID must be an integer.")],
-//   handleValidationErrors,
-//   deleteProduct
-// );
+router.delete(
+  "/:id",
+  authenticateToken,
+  authorizeAdmin,
+  deleteProductValidation,
+  deleteProduct
+);
 
 export default router;

@@ -1,5 +1,6 @@
 import {
   createProductService,
+  deleteProductService,
   getAllProductsService,
   getProductByIdService,
   updateProductService,
@@ -89,5 +90,24 @@ export const updateProduct = async (req, res) => {
   } catch (error) {
     console.error("Update product error", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const productId = parseInt(id, 10);
+    if (isNaN(productId) || productId <= 0) {
+      return res.status(400).json({ error: "Invalid product ID." });
+    }
+    const deletionSuccess = await deleteProductService(productId);
+    if (!deletionSuccess) {
+      return res.status(404).json({ error: "Product not found." });
+    }
+    res.status(200).json({ message: "Product deleted successfully." });
+  } catch (error) {
+    console.error("Delete Product Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
