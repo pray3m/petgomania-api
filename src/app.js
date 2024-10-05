@@ -42,6 +42,10 @@ app.use(cors());
 
 // Routes
 import router from "./routes/index.js";
+app.get("/", (req, res) => {
+  res.send("Welcome to the PetGo API! 🚢");
+});
+
 app.use("/", router);
 
 // 404 Handler
