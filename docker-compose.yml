@@ -6,14 +6,15 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: petgomania-api
-    ports:
-      - "5001:5001" # Expose API on port 5001
+    network_mode: host
+    # ports:
+    #   - "5001:5001" # Expose API on port 5001
     env_file:
       - .env # Load environment variables from the .env file
     restart: always
-    networks:
-      - app-network # Use a network to connect with other services
+    # networks:
+    #   - app-network 
 
-networks:
-  app-network:
-    driver: bridge
+    # networks:
+    #   app-network:
+    #     driver: bridge
