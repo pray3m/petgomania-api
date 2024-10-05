@@ -14,6 +14,9 @@ COPY . .
 # Set NODE_ENV to production
 ENV NODE_ENV=production
 
+# Run Prisma generate to include the correct binary targets
+RUN yarn prisma generate
+
 # Expose port 5001 for the API
 EXPOSE 5001
 
