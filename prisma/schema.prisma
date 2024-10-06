@@ -23,6 +23,7 @@ enum OrderStatus {
   PENDING
   SHIPPED
   DELIVERED
+  CANCELLED
 }
 
 enum AdoptionStatus {
@@ -83,7 +84,8 @@ model Product {
   updatedAt   DateTime        @updatedAt
 
   // Relationships
-  orders Order[]
+  orders    Order[]
+  OrderItem OrderItem[]
 }
 
 // 3. Pet Model
@@ -109,18 +111,34 @@ model Pet {
 // 4. Order Model
 model Order {
   id         Int         @id @default(autoincrement())
-  quantity   Int
   totalPrice Float
-  status     OrderStatus @default(PENDING) // 'pending', 'shipped', 'delivered'
+  status     OrderStatus @default(PENDING)
   createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 
   // Relationships
-  userId    Int
-  productId Int
-  user      User    @relation(fields: [userId], references: [id])
-  product   Product @relation(fields: [productId], references: [id])
+  userId     Int
+  user       User        @relation(fields: [userId], references: [id])
+  orderItems OrderItem[]
+  Product    Product?    @relation(fields: [productId], references: [id])
+  productId  Int?
 
   @@index([userId])
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now())
+
+  // Relationships
+  orderId   Int
+  productId Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
   @@index([productId])
 }
 
