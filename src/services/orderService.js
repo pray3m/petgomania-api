@@ -99,12 +99,12 @@ export const getAllOrdersService = async () => {
   return orders;
 };
 
-export const getOrderByIdService = async (orderId, userId, role) => {
+export const getOrderByIdService = async (orderId) => {
   const order = await prisma.order.findUnique({
     where: { id: orderId },
     include: {
       user: {
-        select: { id, name, email },
+        select: { id: true, name: true, email: true },
       },
       orderItems: {
         include: {
@@ -116,13 +116,6 @@ export const getOrderByIdService = async (orderId, userId, role) => {
 
   if (!order) {
     throw { statusCode: 404, message: "Order not found." };
-  }
-
-  if (role !== "ADMIN" && order.userId !== userId) {
-    throw {
-      statusCode: 403,
-      message: "Forbidden: Access to this order is denied.",
-    };
   }
 
   return order;
