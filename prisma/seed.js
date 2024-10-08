@@ -46,7 +46,7 @@ async function main() {
       price: 39.99,
       category: "food",
       stock: 150,
-      imageUrl: "https://example.com/images/organic-dog-food.jpg",
+      imageUrl: "https://via.placeholder.com/600/92c952",
     },
     {
       name: "Squeaky Chew Toy",
@@ -55,7 +55,7 @@ async function main() {
       price: 14.99,
       category: "toys",
       stock: 300,
-      imageUrl: "https://example.com/images/squeaky-chew-toy.jpg",
+      imageUrl: "https://via.placeholder.com/150/771796",
     },
     {
       name: "Leather Dog Leash",
@@ -63,7 +63,7 @@ async function main() {
       price: 24.99,
       category: "accessories",
       stock: 80,
-      imageUrl: "https://example.com/images/leather-dog-leash.jpg",
+      imageUrl: "https://via.placeholder.com/150/771796",
     },
     {
       name: "Flea & Tick Prevention",
@@ -72,7 +72,7 @@ async function main() {
       price: 19.99,
       category: "healthcare",
       stock: 120,
-      imageUrl: "https://example.com/images/flea-tick-prevention.jpg",
+      imageUrl: "https://via.placeholder.com/600/f66b97",
     },
     {
       name: "Pet Grooming Kit",
@@ -80,7 +80,7 @@ async function main() {
       price: 29.99,
       category: "grooming",
       stock: 60,
-      imageUrl: "https://example.com/images/pet-grooming-kit.jpg",
+      imageUrl: "https://via.placeholder.com/600/56a8c2",
     },
     {
       name: "Interactive Ball Launcher",
@@ -89,7 +89,7 @@ async function main() {
       price: 59.99,
       category: "toys",
       stock: 40,
-      imageUrl: "https://example.com/images/interactive-ball-launcher.jpg",
+      imageUrl: "https://via.placeholder.com/600/54176f",
     },
     {
       name: "Dental Chews for Dogs",
@@ -98,7 +98,7 @@ async function main() {
       price: 12.99,
       category: "healthcare",
       stock: 250,
-      imageUrl: "https://example.com/images/dental-chews.jpg",
+      imageUrl: "https://via.placeholder.com/600/372c93",
     },
     {
       name: "Adjustable Dog Harness",
@@ -106,7 +106,7 @@ async function main() {
       price: 34.99,
       category: "accessories",
       stock: 90,
-      imageUrl: "https://example.com/images/dog-harness.jpg",
+      imageUrl: "https://via.placeholder.com/600/66b7d2",
     },
     {
       name: "Premium Cat Food",
@@ -114,7 +114,7 @@ async function main() {
       price: 44.99,
       category: "food",
       stock: 130,
-      imageUrl: "https://example.com/images/premium-cat-food.jpg",
+      imageUrl: "https://via.placeholder.com/600/1fe46f",
     },
     {
       name: "Catnip Toys",
@@ -122,7 +122,7 @@ async function main() {
       price: 9.99,
       category: "toys",
       stock: 200,
-      imageUrl: "https://example.com/images/catnip-toys.jpg",
+      imageUrl: "https://via.placeholder.com/600/61a65",
     },
   ];
 
