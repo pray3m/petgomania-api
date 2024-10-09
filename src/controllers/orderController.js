@@ -2,6 +2,7 @@ import {
   createOrderService,
   getOrderByIdService,
   getUserOrdersService,
+  updateOrderStatusService,
 } from "../services/orderService.js";
 
 export const createOrder = async (req, res, next) => {
@@ -58,5 +59,23 @@ export const getOrderById = async (req, res) => {
       return res.status(error.statusCode).json({ error: error.message });
     }
     res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+export const updateOrderStatus = async (req, res) => {
+  try {
+    const orderId = parseInt(req.params.id, 10);
+    const { status } = req.body;
+
+    const updatedOrder = await updateOrderStatusService(orderId, status);
+
+    res
+      .status(200)
+      .json({ message: "Order status updated.", order: updatedOrder });
+  } catch (error) {
+    console.error("Updating order status error: ", error);
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({ error: error.message });
+    }
   }
 };

@@ -5,3 +5,5 @@ export const allowedCategories = [
   "healthcare",
   "grooming",
 ];
+
+export const orderStatuses = ["PENDING", "SHIPPED", "DELIVERED", "CANCELLED"];

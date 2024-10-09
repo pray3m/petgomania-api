@@ -1,4 +1,5 @@
 import prisma from "../config/db.js";
+import { orderStatuses } from "../utils/constants.js";
 
 export const createOrderService = async (userId, products) => {
   const order = await prisma.$transaction(async (tx) => {
@@ -119,4 +120,40 @@ export const getOrderByIdService = async (orderId) => {
   }
 
   return order;
+};
+
+export const updateOrderStatusService = async (orderId, status) => {
+  if (!orderStatuses.includes(status)) {
+    throw { statusCode: 400, message: "Invalid order status" };
+  }
+
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    select: { status: true },
+  });
+
+  if (!order) {
+    throw { statusCode: 404, message: "Order not found." };
+  }
+
+  const updatedOrder = await prisma.order.update({
+    where: { id: orderId },
+    data: { status },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      orderItems: {
+        include: {
+          product: true,
+        },
+      },
+    },
+  });
+
+  return updatedOrder;
 };
