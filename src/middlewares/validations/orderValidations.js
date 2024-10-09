@@ -21,3 +21,9 @@ export const updateOrderStatusValidation = [
     .isIn(orderStatuses)
     .withMessage("Invalid status value."),
 ];
+
+export const deleteOrderValidator = [
+  param("id")
+    .isInt({ gt: 0 })
+    .withMessage("Order ID must be a positive integer."),
+];

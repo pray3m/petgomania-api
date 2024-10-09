@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createOrder,
+  deleteOrder,
   getOrderById,
   getUserOrders,
   updateOrderStatus,
@@ -10,7 +11,11 @@ import {
   authorizeAdmin,
 } from "../middlewares/authMiddleware.js";
 import { handleValidationErrors } from "../middlewares/validations/handleValidationErrors.js";
-import { createOrderValidation, updateOrderStatusValidation } from "../middlewares/validations/orderValidations.js";
+import {
+  createOrderValidation,
+  deleteOrderValidator,
+  updateOrderStatusValidation,
+} from "../middlewares/validations/orderValidations.js";
 
 const router = Router();
 
@@ -51,6 +56,21 @@ router.put(
   updateOrderStatusValidation,
   handleValidationErrors,
   updateOrderStatus
+);
+
+/**
+ * @route   DELETE /orders/:id
+ * @desc    Delete a specific order
+ * @access  Private (Admin only)
+ */
+
+router.delete(
+  "/:id",
+  authenticateToken,
+  authorizeAdmin,
+  deleteOrderValidator,
+  handleValidationErrors,
+  deleteOrder
 );
 
 export default router;

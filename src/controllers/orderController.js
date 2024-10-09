@@ -1,5 +1,6 @@
 import {
   createOrderService,
+  deleteOrderService,
   getOrderByIdService,
   getUserOrdersService,
   updateOrderStatusService,
@@ -77,5 +78,21 @@ export const updateOrderStatus = async (req, res) => {
     if (error.statusCode) {
       return res.status(error.statusCode).json({ error: error.message });
     }
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+export const deleteOrder = async (req, res) => {
+  try {
+    const orderId = parseInt(req.params.id, 10);
+
+    const result = await deleteOrderService(orderId);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Deleting order failed: ", error);
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({ error: error.message });
+    }
+    res.status(500).json({ error: "Internal server error." });
   }
 };

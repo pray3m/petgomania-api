@@ -157,3 +157,35 @@ export const updateOrderStatusService = async (orderId, status) => {
 
   return updatedOrder;
 };
+
+export const deleteOrderService = async (orderId) => {
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: {
+      orderItems: true,
+    },
+  });
+
+  if (!order) {
+    throw { statusCode: 404, message: "Order not found." };
+  }
+
+  await prisma.$transaction(async (tx) => {
+    // Add back stock
+    for (const item of order.orderItems) {
+      await tx.product.update({
+        where: { id: item.productId },
+        data: { stock: { increment: item.quantity } },
+      });
+    }
+
+    await tx.orderItem.deleteMany({
+      where: { orderId },
+    });
+
+    // Delete the order
+    await tx.order.delete({ where: { id: orderId } });
+  });
+
+  return { message: "Order deleted successfully." };
+};

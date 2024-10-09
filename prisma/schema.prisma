@@ -32,6 +32,12 @@ enum AdoptionStatus {
   REJECTED
 }
 
+enum PetGender {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
 enum PetHealthStatus {
   HEALTHY
   SICK
@@ -94,6 +100,7 @@ model Pet {
   name         String
   breed        String
   age          Int
+  gender       PetGender        @default(UNKNOWN)
   healthStatus PetHealthStatus?
   description  String
   imageUrl     String?
