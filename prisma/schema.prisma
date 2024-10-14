@@ -154,6 +154,7 @@ model Adoption {
   id        Int            @id @default(autoincrement())
   status    AdoptionStatus @default(PENDING) // 'pending', 'approved', 'rejected'
   createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
 
   // Relationships
   petId     Int
@@ -161,6 +162,7 @@ model Adoption {
   pet       Pet  @relation(fields: [petId], references: [id])
   adopter   User @relation(fields: [adopterId], references: [id])
 
+  @@unique([petId, adopterId])
   @@index([petId])
   @@index([adopterId])
 }
