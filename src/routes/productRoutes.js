@@ -10,6 +10,7 @@ import {
   authenticateToken,
   authorizeAdmin,
 } from "../middlewares/authMiddleware.js";
+import { productUpload } from "../middlewares/upload.js";
 import { handleValidationErrors } from "../middlewares/validations/handleValidationErrors.js";
 import {
   createProductValidation,
@@ -18,7 +19,6 @@ import {
   getProductByIdValidation,
   updateProductValidation,
 } from "../middlewares/validations/productValidations.js";
-import parser from "../middlewares/upload.js";
 
 const router = Router();
 
@@ -42,7 +42,7 @@ router.post(
   "/",
   authenticateToken,
   authorizeAdmin,
-  parser.single("image"),
+  productUpload.single("image"),
   createProductValidation,
   handleValidationErrors,
   createProduct
@@ -52,7 +52,7 @@ router.put(
   "/:id",
   authenticateToken,
   authorizeAdmin,
-  parser.single("image"),
+  productUpload.single("image"),
   updateProductValidation,
   handleValidationErrors,
   updateProduct

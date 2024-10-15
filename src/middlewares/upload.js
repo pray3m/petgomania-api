@@ -2,30 +2,37 @@ import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../config/cloudinary.js";
 import multer from "multer";
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: "petgomania/products",
-    allowed_formats: ["jpg", "png", "jpeg"],
-    transformation: [{ width: 500, height: 500, crop: "limit" }],
-  },
-});
+const ALLOWED_FORMATS = ["jpg", "jpeg", "png"];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-const parser = multer({
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Limit files to 5MB
-  fileFilter: (req, file, cb) => {
-    const filetypes = /jpeg|jpg|png/;
-    const mimetype = filetypes.test(file.mimetype);
-    const extname = filetypes.test(
-      file.originalname.split(".").pop().toLowerCase()
-    );
+const createStorage = (folder) => {
+  return new CloudinaryStorage({
+    cloudinary,
+    params: {
+      folder: `petgomania/${folder}`,
+      allowed_formats: ALLOWED_FORMATS,
+      transformation: [{ width: 500, height: 500, crop: "limit" }],
+    },
+  });
+};
 
-    if (mimetype && extname) {
-      return cb(null, true);
-    }
-    cb(new Error("Only JPG, JPEG, and PNG files are allowed."));
-  },
-});
+const createParser = (storage) => {
+  return multer({
+    storage,
+    limits: { fileSize: MAX_FILE_SIZE },
+    fileFilter: (req, file, cb) => {
+      const ext = file.originalname.split(".").pop().toLowerCase();
+      if (!ALLOWED_FORMATS.includes(ext)) {
+        return cb(
+          new Error(`Only ${ALLOWED_FORMATS.join(", ")} files are allowed.`)
+        );
+      }
+      cb(null, true);
+    },
+  });
+};
 
-export default parser;
+const productUpload = createParser(createStorage("products"));
+const petUpload = createParser(createStorage("pets"));
+
+export { productUpload, petUpload };
