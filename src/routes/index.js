@@ -3,6 +3,7 @@ import productRoutes from "./productRoutes.js";
 import authRoutes from "./authRoutes.js";
 import orderRoutes from "./orderRoutes.js";
 import paymentRoutes from "./paymentRoutes.js";
+import petRoutes from "./petRoutes.js";
 
 const router = Router();
 
@@ -14,5 +15,6 @@ router.use("/auth", authRoutes);
 router.use("/products", productRoutes);
 router.use("/orders", orderRoutes);
 router.use("/payments", paymentRoutes);
+router.use("/pets", petRoutes);
 
 export default router;
