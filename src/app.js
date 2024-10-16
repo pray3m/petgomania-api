@@ -42,6 +42,11 @@ app.use(cors());
 
 // Routes
 import router from "./routes/index.js";
+
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
+});
+
 app.get("/", (req, res) => {
   res.send("Welcome to the PetGo API! 🚢");
 });
