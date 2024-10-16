@@ -34,10 +34,14 @@ export const getAllProducts = async (req, res) => {
   try {
     const { page, limit, category, sortBy, sortOrder, search } = req.query;
 
+    const categoriesArray = category
+      ? category.split(",").map((cat) => cat.trim())
+      : [];
+
     const result = await getAllProductsService({
       page: parseInt(page) || 1,
       limit: parseInt(limit) || 10,
-      category,
+      categories: categoriesArray,
       sortBy,
       sortOrder,
       search,

@@ -9,7 +9,7 @@ const createStorage = (folder) => {
   return new CloudinaryStorage({
     cloudinary,
     params: {
-      folder: `petgomania/${folder}`,
+      folder,
       allowed_formats: ALLOWED_FORMATS,
       transformation: [{ width: 500, height: 500, crop: "limit" }],
     },

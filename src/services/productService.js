@@ -27,7 +27,7 @@ export const createProductService = async ({
 export const getAllProductsService = async ({
   page = 1,
   limit = 10,
-  category,
+  categories,
   sortBy = "createdAt",
   sortOrder = "desc",
   search,
@@ -35,7 +35,9 @@ export const getAllProductsService = async ({
   const skip = (page - 1) * limit;
   const where = {
     AND: [
-      category ? { category } : {},
+      categories && categories.length > 0
+        ? { category: { in: categories } }
+        : {},
       search
         ? {
             OR: [

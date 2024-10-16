@@ -42,8 +42,8 @@ router.post(
   "/",
   authenticateToken,
   authorizeAdmin,
-  productUpload.single("image"),
   createProductValidation,
+  productUpload.single("image"),
   handleValidationErrors,
   createProduct
 );
@@ -52,8 +52,8 @@ router.put(
   "/:id",
   authenticateToken,
   authorizeAdmin,
-  productUpload.single("image"),
   updateProductValidation,
+  productUpload.single("image"),
   handleValidationErrors,
   updateProduct
 );
