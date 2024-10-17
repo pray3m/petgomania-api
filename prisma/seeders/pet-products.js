@@ -51,10 +51,10 @@ export const sampleProducts = [
       "https://fakestoreapi.com/img/61sbMiUnoGL._AC_UL640_QL65_ML3_.jpg",
   },
   {
-    name: "Dog Training Clicker",
-    description: "Clicker for effective dog training.",
+    name: "Dog toys Clicker",
+    description: "Clicker for effective dog toys.",
     price: 8.99,
-    category: "training",
+    category: "toys",
     stock: 150,
     imageUrl:
       "https://fakestoreapi.com/img/71YAIFU48IL._AC_UL640_QL65_ML3_.jpg",
@@ -141,10 +141,10 @@ export const sampleProducts = [
     imageUrl: "https://fakestoreapi.com/img/71HblAHs5xL._AC_UY879_-2.jpg",
   },
   {
-    name: "Pet Training Pads",
-    description: "Absorbent pads for indoor pet training.",
+    name: "Pet toys Pads",
+    description: "Absorbent pads for indoor pet toys.",
     price: 29.99,
-    category: "training",
+    category: "toys",
     stock: 120,
     imageUrl: "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
   },

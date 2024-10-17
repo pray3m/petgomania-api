@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
-import { petProducts, sampleProducts } from "./seeders/pet-products";
+import { sampleProducts } from "./seeders/pet-products.js";
 
 dotenv.config();
 
