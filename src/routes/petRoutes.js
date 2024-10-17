@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { getAllPets } from "../controllers/petController.js";
+import { createPet, getAllPets } from "../controllers/petController.js";
+import { authenticateToken } from "../middlewares/authMiddleware.js";
 
 const router = Router();
 
@@ -10,5 +11,19 @@ const router = Router();
  */
 
 router.get("/", getAllPets);
+
+/**
+ * @route GET /pets/:id
+ * @desc Retrieve a pet by ID
+ * @access Public
+ */
+
+/**
+ * @route POST /pets
+ * @desc Create a new pet
+ * @access Private
+ */
+
+router.post("/", authenticateToken, createPet);
 
 export default router;

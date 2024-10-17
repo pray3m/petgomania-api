@@ -29,3 +29,18 @@ export const getAllPetsService = async (filters) => {
     throw { statusCode: 500, message: "Failed to retrieve pets.", error };
   }
 };
+
+export const createPetService = async (petData, imageFile, userId) => {
+  try {
+    const newPet = await prisma.pet.create({
+      data: {
+        ...petData,
+        image: imageFile.filename,
+        userId,
+      },
+    });
+    return newPet;
+  } catch (error) {
+    throw { statusCode: 500, message: "Failed to create pet.", error };
+  }
+};
