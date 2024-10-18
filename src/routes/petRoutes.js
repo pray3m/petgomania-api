@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { createPet, getAllPets } from "../controllers/petController.js";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
+import { petUpload } from "../middlewares/upload.js";
+import { petValidator } from "../middlewares/validations/petValidations.js";
+import { handleValidationErrors } from "../middlewares/validations/handleValidationErrors.js";
 
 const router = Router();
 
@@ -24,6 +27,13 @@ router.get("/", getAllPets);
  * @access Private
  */
 
-router.post("/", authenticateToken, createPet);
+router.post(
+  "/",
+  authenticateToken,
+  petValidator,
+  petUpload.single("image"),
+  handleValidationErrors,
+  createPet
+);
 
 export default router;

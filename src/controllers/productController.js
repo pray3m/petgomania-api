@@ -90,7 +90,7 @@ export const updateProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ error: "Product not found." });
     }
-    res.status(200).json({ message: "Product updated successfully.", product });
+    res.status(200).json({ message: "Product updated successfully.", product }); f
   } catch (error) {
     console.error("Update product error", error);
     res.status(500).json({ error: "Internal server error" });
