@@ -1,33 +1,34 @@
+import { PetGender, PetHealthStatus } from "@prisma/client";
 import { body } from "express-validator";
 
-export const petValidator = [
+export const createPetValidator = [
   body("name")
-    .optional() // Make optional for updates
-    .isString()
-    .withMessage("Name must be a string.")
     .notEmpty()
-    .withMessage("Name is required."),
+    .withMessage("Name is required.")
+    .isString()
+    .withMessage("Name must be a string."),
 
   body("breed")
-    .optional()
-    .isString()
-    .withMessage("Breed must be a string.")
     .notEmpty()
-    .withMessage("Breed is required."),
+    .withMessage("Breed is required.")
+    .isString()
+    .withMessage("Breed must be a string."),
 
   body("age")
-    .optional()
+    .notEmpty()
+    .withMessage("Age is required.")
     .isInt({ gt: 0 })
     .withMessage("Age must be a positive integer."),
 
   body("gender")
-    .optional()
-    .isIn(["MALE", "FEMALE", "UNKNOWN"])
+    .notEmpty()
+    .withMessage("Gender is required.")
+    .isIn(PetGender)
     .withMessage("Invalid gender."),
 
   body("healthStatus")
     .optional()
-    .isIn(["HEALTHY", "SICK", "RECOVERING"])
+    .isIn(PetHealthStatus)
     .withMessage("Invalid health status."),
 
   body("description")
@@ -36,11 +37,6 @@ export const petValidator = [
     .withMessage("Description must be a string.")
     .notEmpty()
     .withMessage("Description is required."),
-
-  body("status")
-    .optional()
-    .isIn(["AVAILABLE", "PENDING", "ADOPTED"])
-    .withMessage("Invalid status."),
 
   body("imageUrl")
     .optional()

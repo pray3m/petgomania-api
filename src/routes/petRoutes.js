@@ -2,8 +2,8 @@ import { Router } from "express";
 import { createPet, getAllPets } from "../controllers/petController.js";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 import { petUpload } from "../middlewares/upload.js";
-import { petValidator } from "../middlewares/validations/petValidations.js";
 import { handleValidationErrors } from "../middlewares/validations/handleValidationErrors.js";
+import { createPetValidator } from "../middlewares/validations/petValidations.js";
 
 const router = Router();
 
@@ -30,8 +30,8 @@ router.get("/", getAllPets);
 router.post(
   "/",
   authenticateToken,
-  petValidator,
   petUpload.single("image"),
+  createPetValidator,
   handleValidationErrors,
   createPet
 );

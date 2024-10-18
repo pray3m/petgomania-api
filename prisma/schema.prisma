@@ -103,6 +103,7 @@ model Pet {
   gender       PetGender        @default(UNKNOWN)
   healthStatus PetHealthStatus?
   description  String
+  location     String
   imageUrl     String?
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt

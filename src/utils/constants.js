@@ -7,3 +7,7 @@ export const allowedCategories = [
 ];
 
 export const orderStatuses = ["PENDING", "SHIPPED", "DELIVERED", "CANCELLED"];
+
+export const PetGender = ["MALE", "FEMALE", "UNKNOWN"];
+
+export const PetHealthStatus = ["HEALTHY", "SICK", "RECOVERING"];

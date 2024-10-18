@@ -12,12 +12,26 @@ export const getAllPets = async (req, res, next) => {
 
 export const createPet = async (req, res, next) => {
   try {
-    const petData = req.body;
-    const imageFile = req.file;
-    const userId = req.user.id;
+    const { name, description, breed, age, gender, healthStatus } = req.body;
 
-    const newPet = await createPetService(petData, imageFile, userId);
-    res.status(201).json({ pet: newPet });
+    let imageUrl;
+
+    if (req.file && req.file.path) {
+      imageUrl = req.file.path;
+    }
+    const userId = req.user.id;
+    const petData = {
+      name,
+      description,
+      breed,
+      age: parseInt(age, 10),
+      gender,
+      healthStatus,
+      userId,
+      imageUrl,
+    };
+    const pet = await createPetService(petData);
+    res.status(201).json({ message: "Pet added successfully.", pet });
   } catch (error) {
     next(error);
   }

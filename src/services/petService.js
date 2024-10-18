@@ -26,21 +26,21 @@ export const getAllPetsService = async (filters) => {
     });
     return pets;
   } catch (error) {
+    console.error("Error retrieving pets:", error);
     throw { statusCode: 500, message: "Failed to retrieve pets.", error };
   }
 };
 
-export const createPetService = async (petData, imageFile, userId) => {
+export const createPetService = async (petData) => {
   try {
-    const newPet = await prisma.pet.create({
+    const pet = await prisma.pet.create({
       data: {
         ...petData,
-        image: imageFile.filename,
-        userId,
       },
     });
-    return newPet;
+    return pet;
   } catch (error) {
-    throw { statusCode: 500, message: "Failed to create pet.", error };
+    console.error("Error creating pet:", error);
+    throw new Error("Error creating pet: " + error.message);
   }
 };
