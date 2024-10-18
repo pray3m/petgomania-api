@@ -44,3 +44,31 @@ export const createPetService = async (petData) => {
     throw new Error("Error creating pet: " + error.message);
   }
 };
+
+export const getPetByIdService = async (id) => {
+  try {
+    const pet = await prisma.pet.findUnique({
+      where: {
+        id: parseInt(id, 10),
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    if (!pet) {
+      throw { statusCode: 404, message: "Pet not found." };
+    }
+
+    return pet;
+  } catch (error) {
+    console.error("Error retrieving pet by ID:", error);
+    throw new Error("Error retrieving pet: " + error.message);
+  }
+};

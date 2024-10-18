@@ -1,4 +1,8 @@
-import { createPetService, getAllPetsService } from "../services/petService.js";
+import {
+  createPetService,
+  getAllPetsService,
+  getPetByIdService,
+} from "../services/petService.js";
 
 export const getAllPets = async (req, res, next) => {
   try {
@@ -32,6 +36,16 @@ export const createPet = async (req, res, next) => {
     };
     const pet = await createPetService(petData);
     res.status(201).json({ message: "Pet added successfully.", pet });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getPetById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const pet = await getPetByIdService(id);
+    res.status(200).json({ pet });
   } catch (error) {
     next(error);
   }

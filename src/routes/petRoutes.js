@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { createPet, getAllPets } from "../controllers/petController.js";
+import {
+  createPet,
+  getAllPets,
+  getPetById,
+} from "../controllers/petController.js";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 import { petUpload } from "../middlewares/upload.js";
 import { handleValidationErrors } from "../middlewares/validations/handleValidationErrors.js";
@@ -20,6 +24,8 @@ router.get("/", getAllPets);
  * @desc Retrieve a pet by ID
  * @access Public
  */
+
+router.get("/:id", getPetById);
 
 /**
  * @route POST /pets
