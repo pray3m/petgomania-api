@@ -3,6 +3,7 @@ import {
   createPet,
   getAllPets,
   getPetById,
+  getPetsByUserId,
 } from "../controllers/petController.js";
 import { authenticateToken } from "../middlewares/authMiddleware.js";
 import { petUpload } from "../middlewares/upload.js";
@@ -33,12 +34,6 @@ router.get("/:id", getPetById);
  * @access Private
  */
 
-/**
- * @route GET /users/:userId/pets
- * @desc Retrieve all pets listed by a specific user
- * @access Public
- */
-
 router.post(
   "/",
   authenticateToken,
@@ -47,6 +42,14 @@ router.post(
   handleValidationErrors,
   createPet
 );
+
+/**
+ * @route GET GET /pets/users/:userId
+ * @desc Retrieve all pets listed by a specific user
+ * @access Public
+ */
+
+router.get("/users/:userId", getPetsByUserId);
 
 /**
  * @route POST /pets/:id/adopt

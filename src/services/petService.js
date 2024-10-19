@@ -72,3 +72,23 @@ export const getPetByIdService = async (id) => {
     throw new Error("Error retrieving pet: " + error.message);
   }
 };
+
+export const getPetsByUserIdService = async (userId) => {
+  try {
+    const pets = await prisma.pet.findMany({
+      where: {
+        userId: parseInt(userId, 10),
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    if (!pets || pets.length === 0) {
+      throw new Error("No pets found for this user");
+    }
+
+    return pets;
+  } catch (error) {
+    console.error("Error retrieving pets by user ID: ", error);
+    throw new Error("Error retrieving pets by UserID : " + error.message);
+  }
+};
