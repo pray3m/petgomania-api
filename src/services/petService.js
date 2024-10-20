@@ -1,4 +1,5 @@
-import prisma from "../config/db.js";
+import { checkOwnerOrAdmin } from "../middlewares/roleAuth.js";
+import { AppError, handleServiceError, prisma } from "../utils/index.js";
 
 export const getAllPetsService = async (filters) => {
   try {
@@ -27,21 +28,19 @@ export const getAllPetsService = async (filters) => {
     return pets;
   } catch (error) {
     console.error("Error retrieving pets:", error);
-    throw { statusCode: 500, message: "Failed to retrieve pets.", error };
+    throw { statusCode: 500, message: "Failed to retrieve pets." };
   }
 };
 
 export const createPetService = async (petData) => {
   try {
     const pet = await prisma.pet.create({
-      data: {
-        ...petData,
-      },
+      data: petData,
     });
     return pet;
   } catch (error) {
     console.error("Error creating pet:", error);
-    throw new Error("Error creating pet: " + error.message);
+    throw { statusCode: 500, message: "Error creating pet: " + error.message };
   }
 };
 
@@ -63,13 +62,12 @@ export const getPetByIdService = async (id) => {
     });
 
     if (!pet) {
-      throw { statusCode: 404, message: "Pet not found." };
+      throw new AppError(404, `Pet with ID ${id} not found`);
     }
 
     return pet;
   } catch (error) {
-    console.error("Error retrieving pet by ID:", error);
-    throw new Error("Error retrieving pet: " + error.message);
+    handleServiceError(error, "retrieving pet");
   }
 };
 
@@ -83,12 +81,44 @@ export const getPetsByUserIdService = async (userId) => {
     });
 
     if (!pets || pets.length === 0) {
-      throw new Error("No pets found for this user");
+      throw { statusCode: 404, message: "No pets found for this user." };
     }
 
     return pets;
   } catch (error) {
     console.error("Error retrieving pets by user ID: ", error);
-    throw new Error("Error retrieving pets by UserID : " + error.message);
+    throw {
+      statusCode: 500,
+      message: "Error retrieving pets by UserID: " + error.message,
+    };
+  }
+};
+
+export const deletePetService = async (id, userId, userRole) => {
+  const pet = await prisma.pet.findUnique({
+    where: { id: parseInt(id, 10) },
+    include: {
+      user: true,
+    },
+  });
+
+  if (!pet) {
+    throw new AppError(404, "Pet not found. Please check the ID.");
+  }
+
+  checkOwnerOrAdmin(pet.userId, userId, userRole);
+
+  if (pet.userId !== userId && userRole !== "ADMIN") {
+    throw new AppError(403, "Unauthorized: You can only delete your own pets.");
+  }
+
+  try {
+    await prisma.pet.delete({
+      where: { id: parseInt(id, 10) },
+    });
+
+    return { message: "Pet deleted successfully." };
+  } catch (error) {
+    handleServiceError(error, "deleting pet");
   }
 };

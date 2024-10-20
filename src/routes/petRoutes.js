@@ -1,14 +1,15 @@
 import { Router } from "express";
 import {
   createPet,
+  deletePet,
   getAllPets,
   getPetById,
   getPetsByUserId,
 } from "../controllers/petController.js";
-import { authenticateToken } from "../middlewares/authMiddleware.js";
 import { petUpload } from "../middlewares/upload.js";
 import { handleValidationErrors } from "../middlewares/validations/handleValidationErrors.js";
 import { createPetValidator } from "../middlewares/validations/petValidations.js";
+import { authenticate } from "../middlewares/auth.js";
 
 const router = Router();
 
@@ -36,7 +37,7 @@ router.get("/:id", getPetById);
 
 router.post(
   "/",
-  authenticateToken,
+  authenticate,
   petUpload.single("image"),
   createPetValidator,
   handleValidationErrors,
@@ -44,7 +45,7 @@ router.post(
 );
 
 /**
- * @route GET GET /pets/users/:userId
+ * @route GET /pets/users/:userId
  * @desc Retrieve all pets listed by a specific user
  * @access Public
  */
@@ -52,21 +53,19 @@ router.post(
 router.get("/users/:userId", getPetsByUserId);
 
 /**
- * @route POST /pets/:id/adopt
- * @desc Mark a pet as adopted by a user
- * @access Private
- */
-
-/**
  * @route PUT /pets/:id
  * @desc Update a pet's information
  * @access Private
  */
 
+// router.put("/:id", updatePet);
+
 /**
  * @route DELETE /pets/:id
  * @desc Delete a pet by ID
- * @access Private
+ * @access Owner or Admin
  */
+
+router.delete("/:id", authenticate, deletePet);
 
 export default router;
