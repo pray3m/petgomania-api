@@ -1,73 +1,58 @@
 import { Router } from "express";
-import { body } from "express-validator";
 import {
   login,
   register,
   resendOtp,
   verifyEmail,
 } from "../controllers/authController.js";
+import {
+  loginValidator,
+  registerValidator,
+  resendOtpValidator,
+  verifyEmailValidator,
+} from "../middlewares/validations/authValidations.js";
+import { handleValidationErrors } from "../middlewares/validations/handleValidationErrors.js";
 
 const router = Router();
 
-// Registration route
+/**
+ * @route POST /auth/register
+ * @description Register a new user
+ * @access Public
+ */
 router.post(
   "/register",
-  [
-    body("name").trim().notEmpty().withMessage("Name is required."),
-    body("email")
-      .isEmail()
-      .withMessage("Valid email is required.")
-      .normalizeEmail(),
-    body("password")
-      .isLength({ min: 8 })
-      .withMessage("Password must be at least 8 characters long.")
-      .matches(/\d/)
-      .withMessage("Password must contain at least one number.")
-      .matches(/[A-Z]/)
-      .withMessage("Password must contain at least one uppercase letter.")
-      .trim(),
-  ],
+  [...registerValidator, handleValidationErrors],
   register
 );
 
-// Email verification route
+/**
+ * @route POST /auth/verify-email
+ * @description Verify user email with OTP
+ * @access Public
+ */
 router.post(
   "/verify-email",
-  [
-    body("email")
-      .isEmail()
-      .withMessage("Valid email is required.")
-      .normalizeEmail(),
-    body("otpCode")
-      .isLength({ min: 6, max: 6 })
-      .withMessage("OTP code must be 6 digits."),
-  ],
+  [...verifyEmailValidator, handleValidationErrors],
   verifyEmail
 );
 
-// Resend OTP route
+/**
+ * @route POST /auth/resend-otp
+ * @description Resend OTP for email verification
+ * @access Public
+ */
 router.post(
   "/resend-otp",
-  [
-    body("email")
-      .isEmail()
-      .withMessage("Valid email is required.")
-      .normalizeEmail(),
-  ],
+  [...resendOtpValidator, handleValidationErrors],
   resendOtp
 );
 
-// Login route
-router.post(
-  "/login",
-  [
-    body("email")
-      .isEmail()
-      .withMessage("Valid email is required.")
-      .normalizeEmail(),
-    body("password").notEmpty().withMessage("Password is required."),
-  ],
-  login
-);
+/**
+ * @route POST /auth/login
+ * @description User login
+ * @access Public
+ */
+router.post("/login", [...loginValidator, handleValidationErrors], login);
 
 export default router;

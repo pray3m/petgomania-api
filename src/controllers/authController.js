@@ -11,27 +11,22 @@ import {
   sendOtpEmail,
 } from "../utils/helpers.js";
 
-export const register = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
+export const register = async (req, res, next) => {
   const { name, email, password, role } = req.body;
   try {
     await registerUser({ name, email, password, role });
 
     res.status(201).json({
+      status: "success",
       message:
         "Registration successful. Please check your email to verify your account.",
     });
   } catch (error) {
-    console.error(error.message);
-    handleErrorResponse(res, 400, error.message);
+    next(error);
   }
 };
 
-export const verifyEmail = async (req, res) => {
+export const verifyEmail = async (req, res, next) => {
   try {
     const { email, otpCode } = req.body;
 
@@ -40,37 +35,33 @@ export const verifyEmail = async (req, res) => {
       .status(200)
       .json({ message: "Email verified successfully. You can now log in." });
   } catch (error) {
-    console.error("Email verification error:", error);
-    handleErrorResponse(res, 400, error.message);
+    next(error);
   }
 };
 
-export const login = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
+export const login = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
     const { user, token } = await loginUser({ email, password });
     res.status(200).json({
       message: "Login successful.",
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
+      data: {
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+        token,
       },
-      token,
     });
   } catch (error) {
-    console.error("Login error:", error);
-    handleErrorResponse(res, 401, error.message);
+    next(error);
   }
 };
 
-export const resendOtp = async (req, res) => {
+export const resendOtp = async (req, res, next) => {
   try {
     const { email } = req.body;
 
@@ -96,7 +87,6 @@ export const resendOtp = async (req, res) => {
 
     res.status(200).json({ message: "A new OTP has been sent to your email." });
   } catch (error) {
-    console.error("Resend OTP error:", error);
-    res.status(500).json({ error: "Internal server error." });
+    next(error);
   }
 };

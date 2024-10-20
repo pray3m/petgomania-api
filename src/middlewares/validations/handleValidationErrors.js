@@ -1,10 +1,12 @@
 import { validationResult } from "express-validator";
+import path from "path";
+import fs from "fs";
 
 export const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    // Only  locally (not applicable for Cloudinary directly)
+    // Clean up uploaded file if exists
     if (req.file) {
       const filePath = path.join(__dirname, "..", req.file.path);
       fs.unlink(filePath, (err) => {
@@ -12,9 +14,8 @@ export const handleValidationErrors = (req, res, next) => {
       });
     }
 
-    // Map errors to a simple array of field and message
     const simplifiedErrors = errors.array().map((error) => ({
-      field: error.param,
+      field: error.path,
       message: error.msg,
     }));
 
