@@ -23,7 +23,7 @@ export const authenticate = async (req, res, next) => {
     if (!user) {
       return res.status(401).json({
         status: "error",
-        message: "User not found",
+        message: "User not found. Please check your credentials and try again.",
       });
     }
 
@@ -34,7 +34,8 @@ export const authenticate = async (req, res, next) => {
     if (error instanceof jwt.JsonWebTokenError) {
       return res.status(401).json({
         status: "error",
-        message: "Invalid or expired token",
+        message:
+          "Invalid or expired token. Please log in again to obtain a new token.",
       });
     }
     next(error);

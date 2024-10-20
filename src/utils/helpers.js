@@ -18,34 +18,17 @@ export const sendOtpEmail = async (email, name, otpCode) => {
   await sendEmail(email, emailSubject, emailBody);
 };
 
-export const handleErrorResponse = (res, statusCode, errorMessage) => {
-  return res.status(statusCode).json({ error: errorMessage });
-};
-
 // Extracts the Cloudinary publicId from a given imageUrl
-export const extractPublicId = (imageUrl) => {
+export const extractPublicId = (url) => {
   try {
-    const url = new URL(imageUrl);
-    const pathSegments = url.pathname.split("/");
-
-    // Example URL pathSegments:
-    // ['', 'image', 'upload', 'v1727982231', 'petgomania', 'products', 'nicmyzmtmezcu0u2ufgo.jpg']
-
-    const uploadIndex = pathSegments.findIndex(
-      (segment) => segment === "upload"
-    );
-
-    if (uploadIndex === -1 || uploadIndex + 1 >= pathSegments.length) {
-      console.error("Unexpected imageUrl format:", imageUrl);
-      return null;
-    }
-
-    const publicIdWithExtension = pathSegments.slice(uploadIndex + 1).join("/");
-    const publicId = publicIdWithExtension.split(".").slice(0, -1).join(".");
-
-    return publicId;
+    // Extract the public ID from Cloudinary URL
+    // Example URL: https://res.cloudinary.com/your-cloud/image/upload/v1234567890/folder/public-id.jpg
+    const urlParts = url.split("/");
+    const filename = urlParts[urlParts.length - 1];
+    // Remove the file extension
+    return filename.split(".")[0];
   } catch (error) {
-    console.error("Error extracting publicId:", error);
+    console.error("Error extracting public ID :", error);
     return null;
   }
 };

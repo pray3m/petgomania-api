@@ -9,6 +9,10 @@ const UPLOAD_CONFIG = {
     width: 500,
     height: 500,
     crop: "limit",
+    quality: "auto", // Automatically optimize quality
+    fetch_format: "auto", // Automatically choose best format
+    flags: "lossy", // Enable lossy compression
+    strip: true, // Strip metadata to reduce size
   },
 };
 
@@ -31,7 +35,7 @@ const createCloudinaryStorage = (folder) => {
 const createParser = (storage) => {
   return multer({
     storage,
-    limits: { fileSize: UPLOAD_CONFIG.MAX_FILE_SIZE },
+    limits: { fileSize: UPLOAD_CONFIG.MAX_FILE_SIZE, files: 5 },
     fileFilter: (req, file, cb) => {
       const ext = file.originalname.split(".").pop().toLowerCase();
       if (!UPLOAD_CONFIG.ALLOWED_FORMATS.includes(ext)) {

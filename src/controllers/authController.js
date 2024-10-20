@@ -1,4 +1,3 @@
-import { validationResult } from "express-validator";
 import prisma from "../config/db.js";
 import {
   loginUser,
@@ -7,8 +6,7 @@ import {
 } from "../services/authService.js";
 import {
   generateOtp,
-  handleErrorResponse,
-  sendOtpEmail,
+  sendOtpEmail
 } from "../utils/helpers.js";
 
 export const register = async (req, res, next) => {
@@ -45,16 +43,13 @@ export const login = async (req, res, next) => {
   try {
     const { user, token } = await loginUser({ email, password });
     res.status(200).json({
+      status: "success",
       message: "Login successful.",
-      data: {
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
-        token,
+      user: {
+        name: user.name,
+        email: user.email,
       },
+      token,
     });
   } catch (error) {
     next(error);
@@ -85,7 +80,10 @@ export const resendOtp = async (req, res, next) => {
 
     await sendOtpEmail(email, user.name, otpCode);
 
-    res.status(200).json({ message: "A new OTP has been sent to your email." });
+    res.status(200).json({
+      status: "success",
+      message: "A new OTP has been sent to your email.",
+    });
   } catch (error) {
     next(error);
   }

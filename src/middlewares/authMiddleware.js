@@ -1,6 +1,8 @@
 import prisma from "../config/db.js";
 import jwt from "jsonwebtoken";
 
+// TODO : Remove this file and use the auth.js and roleAuth.js files in the middlewares folder
+
 export const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
 
