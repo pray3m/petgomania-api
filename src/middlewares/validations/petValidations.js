@@ -1,45 +1,44 @@
+import { body, param } from "express-validator";
 import { PetGender, PetHealthStatus } from "@prisma/client";
-import { body } from "express-validator";
 
 export const createPetValidator = [
-  body("name")
-    .notEmpty()
-    .withMessage("Name is required.")
-    .isString()
-    .withMessage("Name must be a string."),
+  body("name").trim().notEmpty().withMessage("Pet name is required."),
 
-  body("breed")
-    .notEmpty()
-    .withMessage("Breed is required.")
-    .isString()
-    .withMessage("Breed must be a string."),
+  body("breed").trim().notEmpty().withMessage("Pet breed is required."),
 
   body("age")
-    .notEmpty()
-    .withMessage("Age is required.")
-    .isInt({ gt: 0 })
-    .withMessage("Age must be a positive integer."),
+    .isInt({ min: 0 })
+    .withMessage("Pet age must be a non-negative integer."),
 
-  body("gender")
-    .notEmpty()
-    .withMessage("Gender is required.")
-    .isIn(PetGender)
-    .withMessage("Invalid gender."),
+  body("gender").isIn(PetGender).withMessage("Valid Pet gender is required."),
 
   body("healthStatus")
     .optional()
     .isIn(PetHealthStatus)
-    .withMessage("Invalid health status."),
+    .withMessage("Valid health status is required."),
 
   body("description")
-    .optional()
-    .isString()
-    .withMessage("Description must be a string.")
+    .trim()
     .notEmpty()
-    .withMessage("Description is required."),
+    .withMessage("Pet description is required."),
 
-  body("imageUrl")
-    .optional()
-    .isURL()
-    .withMessage("Image URL must be a valid URL."),
+  body("location").trim().notEmpty().withMessage("Pet location is required."),
+];
+
+export const deletePetValidator = [
+  param("id")
+    .isInt({ gt: 0 })
+    .withMessage("Pet ID must be a positive integer."),
+];
+
+export const getPetByIdValidator = [
+  param("id")
+    .isInt({ gt: 0 })
+    .withMessage("Pet ID must be a positive integer."),
+];
+
+export const getPetsByUserIdValidator = [
+  param("userId")
+    .isInt({ gt: 0 })
+    .withMessage("User ID must be a positive integer."),
 ];

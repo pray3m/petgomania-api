@@ -36,7 +36,8 @@ export const getPetById = async (req, res, next) => {
 
 export const createPet = async (req, res, next) => {
   try {
-    const { name, description, breed, age, gender, healthStatus } = req.body;
+    const { name, description, breed, age, gender, healthStatus, location } =
+      req.body;
 
     let imageUrl;
 
@@ -51,6 +52,7 @@ export const createPet = async (req, res, next) => {
       age: parseInt(age, 10),
       gender,
       healthStatus,
+      location,
       userId,
       imageUrl,
     };

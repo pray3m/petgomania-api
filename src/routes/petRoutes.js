@@ -15,7 +15,7 @@ const router = Router();
 
 /**
  * @route GET /pets
- * @desc Retrieve all pets with optional filters
+ * @description Retrieve all pets with optional filters
  * @access Public
  */
 
@@ -23,7 +23,7 @@ router.get("/", getAllPets);
 
 /**
  * @route GET /pets/:id
- * @desc Retrieve a pet by ID
+ * @description Retrieve a pet by ID
  * @access Public
  */
 
@@ -31,7 +31,7 @@ router.get("/:id", getPetById);
 
 /**
  * @route POST /pets
- * @desc Create a new pet
+ * @description Create a new pet
  * @access Private
  */
 
@@ -46,7 +46,7 @@ router.post(
 
 /**
  * @route GET /pets/users/:userId
- * @desc Retrieve all pets listed by a specific user
+ * @description Retrieve all pets listed by a specific user
  * @access Public
  */
 
@@ -54,7 +54,7 @@ router.get("/users/:userId", getPetsByUserId);
 
 /**
  * @route PUT /pets/:id
- * @desc Update a pet's information
+ * @description Update a pet's information
  * @access Private
  */
 
@@ -62,7 +62,7 @@ router.get("/users/:userId", getPetsByUserId);
 
 /**
  * @route DELETE /pets/:id
- * @desc Delete a pet by ID
+ * @description Delete a pet by ID
  * @access Owner or Admin
  */
 
