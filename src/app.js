@@ -54,11 +54,11 @@ app.get("/", (req, res) => {
 app.use("/", router);
 
 // 404 Handler
+import { AppError, errorHandler } from "./utils/index.js";
 app.use((req, res, next) => {
-  res.status(404).json({ error: "Not Found" });
+  throw new AppError(404, "Resource not found");
 });
 
-import errorHandler from "./middlewares/errorHandler.js";
 app.use(errorHandler);
 
 // Handle Uncaught Exceptions and Rejections
