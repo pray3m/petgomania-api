@@ -13,7 +13,7 @@ export const getAllPets = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "Pets retrieved successfully",
-      data: pets,
+      pets,
     });
   } catch (error) {
     next(error);
@@ -27,7 +27,7 @@ export const getPetById = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "Pet retrieved successfully",
-      data: pet,
+      pet,
     });
   } catch (error) {
     next(error);
@@ -60,7 +60,7 @@ export const createPet = async (req, res, next) => {
     res.status(201).json({
       status: "success",
       message: "Pet added successfully.",
-      data: pet,
+      pet,
     });
   } catch (error) {
     next(error);
@@ -74,7 +74,7 @@ export const getPetsByUserId = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "Pets retrieved successfully",
-      data: pets,
+      pets,
     });
   } catch (error) {
     next(error);
