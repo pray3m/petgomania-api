@@ -62,7 +62,7 @@ model User {
   isVerified   Boolean   @default(false)
   otpCode      String?
   otpExpiresAt DateTime?
-  otpAttempts  Int       @default(0)
+  otpAttempts  Int?      @default(0)
   createdAt    DateTime  @default(now())
 
   // Relationships
@@ -100,7 +100,7 @@ model Pet {
   name         String
   breed        String
   age          Int
-  gender       PetGender        @default(UNKNOWN)
+  gender       PetGender
   healthStatus PetHealthStatus?
   description  String
   location     String
@@ -139,6 +139,7 @@ model OrderItem {
   quantity  Int
   price     Float
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relationships
   orderId   Int
