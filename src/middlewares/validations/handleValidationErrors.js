@@ -1,17 +1,33 @@
 import { validationResult } from "express-validator";
-import path from "path";
 import fs from "fs";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
+import cloudinary from "../../config/cloudinary.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    // Clean up uploaded file if exists
-    if (req.file) {
-      const filePath = path.join(__dirname, "..", req.file.path);
-      fs.unlink(filePath, (err) => {
-        if (err) console.error("Failed to delete file:", err);
-      });
+    // If there's a file upload and validation failed, delete from Cloudinary
+    if (req.file && req.file.path) {
+      try {
+        // Extract public_id from Cloudinary URL
+        const publicId =
+          req.file.filename ||
+          req.file.path.split("/").slice(-1)[0].split(".")[0];
+
+        // Delete the uploaded file from Cloudinary
+        cloudinary.uploader
+          .destroy(publicId)
+          .catch((err) =>
+            console.error("Failed to delete from Cloudinary:", err)
+          );
+      } catch (err) {
+        console.error("Error handling Cloudinary cleanup:", err);
+      }
     }
 
     const simplifiedErrors = errors.array().map((error) => ({
