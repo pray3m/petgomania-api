@@ -6,7 +6,7 @@ import {
   updateProductService,
 } from "../services/productService.js";
 
-export const createProduct = async (req, res) => {
+export const createProduct = async (req, res, next) => {
   try {
     const { name, description, price, category, stock } = req.body;
     let imageUrl;
@@ -23,14 +23,17 @@ export const createProduct = async (req, res) => {
       stock: parseInt(stock),
       imageUrl,
     });
-    res.status(201).json({ message: "Product created successfully.", product });
+    res.status(201).json({
+      status: "success",
+      message: "Product created successfully.",
+      product,
+    });
   } catch (error) {
-    console.error("Create Product Error:", error);
-    res.status(500).json({ error: "Internal server error." });
+    next(error);
   }
 };
 
-export const getAllProducts = async (req, res) => {
+export const getAllProducts = async (req, res, next) => {
   try {
     const { page, limit, category, sortBy, sortOrder, search } = req.query;
 
@@ -47,28 +50,33 @@ export const getAllProducts = async (req, res) => {
       search,
     });
 
-    res.status(200).json({ ...result });
+    res.status(200).json({
+      status: "success",
+      message: "Products retrieved successfully",
+      products: result.products,
+      meta: result.meta,
+    });
   } catch (error) {
-    console.error("Get All Products Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    next(error);
   }
 };
 
-export const getProductById = async (req, res) => {
+export const getProductById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const product = await getProductByIdService(parseInt(id));
-    if (!product) {
-      return res.status(404).json({ error: "Product not found." });
-    }
-    res.status(200).json({ product });
+
+    res.status(200).json({
+      status: "success",
+      message: "Product retrieved successfully",
+      product,
+    });
   } catch (error) {
-    console.error("Get Product By ID Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    next(error);
   }
 };
 
-export const updateProduct = async (req, res) => {
+export const updateProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { name, description, price, category, stock } = req.body;
@@ -87,31 +95,28 @@ export const updateProduct = async (req, res) => {
     if (imageUrl) updateData.imageUrl = imageUrl;
 
     const product = await updateProductService(parseInt(id), updateData);
-    if (!product) {
-      return res.status(404).json({ error: "Product not found." });
-    }
-    res.status(200).json({ message: "Product updated successfully.", product }); f
+
+    res.status(200).json({
+      status: "success",
+      message: "Product updated successfully.",
+      product,
+    });
   } catch (error) {
-    console.error("Update product error", error);
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 };
 
-export const deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
 
     const productId = parseInt(id, 10);
-    if (isNaN(productId) || productId <= 0) {
-      return res.status(400).json({ error: "Invalid product ID." });
-    }
-    const deletionSuccess = await deleteProductService(productId);
-    if (!deletionSuccess) {
-      return res.status(404).json({ error: "Product not found." });
-    }
-    res.status(200).json({ message: "Product deleted successfully." });
+
+    await deleteProductService(productId);
+    res
+      .status(200)
+      .json({ status: "success", message: "Product deleted successfully." });
   } catch (error) {
-    console.error("Delete Product Error:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    next(error);
   }
 };

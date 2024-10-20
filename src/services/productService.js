@@ -1,6 +1,8 @@
 import cloudinary from "../config/cloudinary.js";
 import prisma from "../config/db.js";
+import AppError from "../utils/AppError.js";
 import { allowedCategories } from "../utils/constants.js";
+import { handleServiceError } from "../utils/handleServiceError.js";
 import { extractPublicId } from "../utils/helpers.js";
 
 export const createProductService = async ({
@@ -11,17 +13,21 @@ export const createProductService = async ({
   stock,
   imageUrl,
 }) => {
-  const product = await prisma.product.create({
-    data: {
-      name,
-      description,
-      price,
-      category,
-      stock,
-      imageUrl,
-    },
-  });
-  return product;
+  try {
+    const product = await prisma.product.create({
+      data: {
+        name,
+        description,
+        price,
+        category,
+        stock,
+        imageUrl,
+      },
+    });
+    return product;
+  } catch (error) {
+    handleServiceError(error, "adding product");
+  }
 };
 
 export const getAllProductsService = async ({
@@ -55,122 +61,129 @@ export const getAllProductsService = async ({
 
   sortOrder = sortOrder.toLowerCase() === "asc" ? "asc" : "desc";
 
-  const [products, total] = await Promise.all([
-    prisma.product.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy: {
-        [sortBy]: sortOrder,
-      },
-    }),
-    prisma.product.count({ where }),
-  ]);
-
-  const totalPages = Math.ceil(total / limit);
-
-  return {
-    products,
-    meta: {
-      total,
-      page,
-      limit,
-      totalPages,
-    },
-  };
-};
-
-export const getProductByIdService = async (id) => {
-  const product = await prisma.product.findUnique({
-    where: { id },
-  });
-  return product;
-};
-
-export const updateProductService = async (id, data) => {
   try {
-    if (data.category && !allowedCategories.includes(data.category)) {
-      throw new Error("Invalid category");
-    }
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: {
+          [sortBy]: sortOrder,
+        },
+      }),
+      prisma.product.count({ where }),
+    ]);
 
-    if (data.imageUrl) {
-      const existingProduct = await prisma.product.findUnique({
-        where: { id },
-      });
+    const totalPages = Math.ceil(total / limit);
 
-      if (!existingProduct) {
-        return null;
-      }
-
-      if (existingProduct.imageUrl) {
-        const publicId = extractPublicId(existingProduct.imageUrl);
-        await cloudinary.uploader.destroy(publicId);
-      }
-    }
-
-    const updatedProduct = await prisma.product.update({
-      where: { id },
-      data: {
-        name: data.name,
-        description: data.description,
-        price: data.price,
-        category: data.category,
-        stock: data.stock,
-        imageUrl: data.imageUrl, // This will be null if not provided
+    return {
+      products,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
       },
-    });
-
-    return updatedProduct;
+    };
   } catch (error) {
-    if (error.code === "P2025") {
-      // Record not found
-      return null;
-    }
-    throw error;
+    handleServiceError(error, "Get Products Error");
   }
 };
 
-export const deleteProductService = async (id) => {
+export const getProductByIdService = async (id) => {
   try {
     const product = await prisma.product.findUnique({
       where: { id },
     });
 
     if (!product) {
-      return false;
+      throw new AppError(404, `Product with ID ${id} not found`);
     }
 
-    if (product.imageUrl) {
-      const publicId = extractPublicId(product.imageUrl);
+    return product;
+  } catch (error) {
+    handleServiceError(error, "retrieving product");
+  }
+};
 
-      if (publicId) {
-        const deleteResult = await cloudinary.uploader.destroy(publicId);
-
-        if (
-          deleteResult.result !== "ok" &&
-          deleteResult.result !== "not found"
-        ) {
-          throw new Error(
-            `Failed to delete image from Cloudinary: ${deleteResult.result}`
-          );
-        }
-
-        console.log(`Image with publicId '${publicId}' deleted successfully.`);
-      } else {
-        console.error(
-          "Could not extract publicId from imageUrl:",
-          product.imageUrl
-        );
-      }
-    }
-
-    await prisma.product.delete({
+export const updateProductService = async (id, data) => {
+  try {
+    const existingProduct = await prisma.product.findUnique({
       where: { id },
     });
 
-    return true;
+    if (!existingProduct) {
+      throw new AppError(404, `Product with ID ${id} doesn't exist.`);
+    }
+
+    // Handle image update if new image is provided
+    if (data.imageUrl && existingProduct.imageUrl) {
+      try {
+        const publicId = extractPublicId(existingProduct.imageUrl);
+        if (publicId) {
+          await cloudinary.uploader.destroy(publicId, {
+            invalidate: true,
+          });
+        }
+      } catch (error) {
+        console.error("Error deleting old image from Cloudinary:", error);
+        // Continue with update even if image deletion fails
+      }
+    }
+
+    const updatedProduct = await prisma.product.update({
+      where: { id },
+      data,
+    });
+
+    return updatedProduct;
   } catch (error) {
-    console.error("Delete Product Error:", error);
-    throw error;
+    handleServiceError(error, "Updating product.");
+  }
+};
+
+export const deleteProductService = async (id) => {
+  try {
+    return await prisma.$transaction(async (tx) => {
+      // Find the product first
+      const product = await tx.product.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          imageUrl: true,
+          name: true,
+        },
+      });
+
+      if (!product) {
+        throw new AppError(404, `Product with ID ${id} not found`);
+      }
+
+      // Delete image from Cloudinary if exists
+      if (product.imageUrl) {
+        const publicId = extractPublicId(product.imageUrl);
+        if (publicId) {
+          try {
+            await cloudinary.uploader.destroy(publicId, {
+              invalidate: true,
+              resource_type: "image",
+            });
+          } catch (cloudinaryError) {
+            console.error("Failed to delete image from Cloudinary:", {
+              id,
+              error: cloudinaryError.message,
+            });
+          }
+        }
+      }
+
+      await tx.product.delete({
+        where: { id },
+      });
+
+      return true;
+    });
+  } catch (error) {
+    handleServiceError(error, "deleting product");
   }
 };

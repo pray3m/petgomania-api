@@ -6,63 +6,80 @@ import {
   getProductById,
   updateProduct,
 } from "../controllers/productController.js";
-import {
-  authenticateToken,
-  authorizeAdmin,
-} from "../middlewares/authMiddleware.js";
+import { authenticate } from "../middlewares/auth.js";
+import { authorize } from "../middlewares/roleAuth.js";
 import { productUpload } from "../middlewares/upload.js";
 import { handleValidationErrors } from "../middlewares/validations/handleValidationErrors.js";
 import {
-  createProductValidation,
-  deleteProductValidation,
-  getAllProductsValidation,
-  getProductByIdValidation,
-  updateProductValidation,
+  createProductValidator,
+  deleteProductValidator,
+  getAllProductsValidator,
+  getProductByIdValidator,
+  updateProductValidator,
 } from "../middlewares/validations/productValidations.js";
 
 const router = Router();
 
-// Public Routes
+/**
+ * @route GET /products
+ * @description Get all products with optional filters (pagination, sorting, category, search)
+ * @access Public
+ */
 router.get(
   "/",
-  getAllProductsValidation,
-  handleValidationErrors,
+  [...getAllProductsValidator, handleValidationErrors],
   getAllProducts
 );
 
+/**
+ * @route GET /products/:id
+ * @description Get a product by its ID
+ * @access Public
+ */
 router.get(
   "/:id",
-  getProductByIdValidation,
-  handleValidationErrors,
+  [...getProductByIdValidator, handleValidationErrors],
   getProductById
 );
 
-// Admin Routes
+/**
+ * @route POST /products
+ * @description Create a new product (Admin only)
+ * @access Private (Admin)
+ */
 router.post(
   "/",
-  authenticateToken,
-  authorizeAdmin,
-  createProductValidation,
+  authenticate,
+  authorize("ADMIN"),
   productUpload.single("image"),
-  handleValidationErrors,
+  [...createProductValidator, handleValidationErrors],
   createProduct
 );
 
+/**
+ * @route PUT /products/:id
+ * @description Update a product by its ID (Admin only)
+ * @access Private (Admin)
+ */
 router.put(
   "/:id",
-  authenticateToken,
-  authorizeAdmin,
-  updateProductValidation,
+  authenticate,
+  authorize("ADMIN"),
   productUpload.single("image"),
-  handleValidationErrors,
+  [...updateProductValidator, handleValidationErrors],
   updateProduct
 );
 
+/**
+ * @route DELETE /products/:id
+ * @description Delete a product by its ID (Admin only)
+ * @access Private (Admin)
+ */
 router.delete(
   "/:id",
-  authenticateToken,
-  authorizeAdmin,
-  deleteProductValidation,
+  authenticate,
+  authorize("ADMIN"),
+  [...deleteProductValidator, handleValidationErrors],
   deleteProduct
 );
 

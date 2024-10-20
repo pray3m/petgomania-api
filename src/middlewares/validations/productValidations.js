@@ -1,36 +1,33 @@
 import { body, param, query } from "express-validator";
-import { allowedCategories } from "../../utils/constants.js";
+import { ProductCategory } from "@prisma/client";
 
-export const getAllProductsValidation = [
-  [
-    query("page")
-      .optional()
-      .isInt({ min: 1 })
-      .withMessage("Page must be a positive integer."),
-    query("limit")
-      .optional()
-      .isInt({ min: 1 })
-      .withMessage("Limit must be a positive integer."),
-    query("category")
-      .optional()
-      .isString()
-      .withMessage("Category must be a string."),
-    query("sortBy")
-      .optional()
-      .isIn(["name", "price", "createdAt", "updatedAt"])
-      .withMessage("Invalid sortBy field."),
-    query("sortOrder")
-      .optional()
-      .isIn(["asc", "desc"])
-      .withMessage("SortOrder must be 'asc' or 'desc'."),
-    query("search")
-      .optional()
-      .isString()
-      .withMessage("Search must be a string."),
-  ],
+export const getAllProductsValidator = [
+  query("page")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("Page must be a positive integer."),
+  query("limit")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("Limit must be a positive integer."),
+  query("category")
+    .optional()
+    .isString()
+    .withMessage("Category must be a string.")
+    .isIn(ProductCategory)
+    .withMessage("Invalid category field"),
+  query("sortBy")
+    .optional()
+    .isIn(["name", "price", "createdAt", "updatedAt"])
+    .withMessage("Invalid sortBy field."),
+  query("sortOrder")
+    .optional()
+    .isIn(["asc", "desc"])
+    .withMessage("SortOrder must be 'asc' or 'desc'."),
+  query("search").optional().isString().withMessage("Search must be a string."),
 ];
 
-export const createProductValidation = [
+export const createProductValidator = [
   body("name").trim().notEmpty().withMessage("Product name is required."),
   body("description")
     .trim()
@@ -39,7 +36,7 @@ export const createProductValidation = [
   body("price")
     .isFloat({ gt: 0 })
     .withMessage("Price must be a positive number."),
-  body("category").isIn(allowedCategories).withMessage("Invalid category."),
+  body("category").isIn(ProductCategory).withMessage("Invalid category field."),
   body("stock")
     .isInt({ min: 0 })
     .withMessage("Stock must be a non-negative integer."),
@@ -49,12 +46,11 @@ export const createProductValidation = [
     .withMessage("Image URL must be a valid URL."),
 ];
 
-export const getProductByIdValidation = [
+export const getProductByIdValidator = [
   param("id").isInt().withMessage("Product ID must be an integer."),
 ];
 
-// Update Product Validation
-export const updateProductValidation = [
+export const updateProductValidator = [
   param("id").isInt().withMessage("Product ID must be an integer."),
   body("name")
     .optional()
@@ -72,8 +68,8 @@ export const updateProductValidation = [
     .withMessage("Price must be a positive number."),
   body("category")
     .optional()
-    .isIn(allowedCategories)
-    .withMessage("Category is invalid."),
+    .isIn(ProductCategory)
+    .withMessage("Invalid category field."),
   body("stock")
     .optional()
     .isInt({ min: 0 })
@@ -84,7 +80,6 @@ export const updateProductValidation = [
     .withMessage("Image URL must be a valid URL."),
 ];
 
-// Delete Product Validation
-export const deleteProductValidation = [
+export const deleteProductValidator = [
   param("id").isInt().withMessage("Product ID must be an integer."),
 ];
