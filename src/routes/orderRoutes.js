@@ -6,10 +6,8 @@ import {
   getUserOrders,
   updateOrderStatus,
 } from "../controllers/orderController.js";
-import {
-  authenticateToken,
-  authorizeAdmin,
-} from "../middlewares/authMiddleware.js";
+import { authenticate } from "../middlewares/auth.js";
+import { authorize } from "../middlewares/roleAuth.js";
 import { handleValidationErrors } from "../middlewares/validations/handleValidationErrors.js";
 import {
   createOrderValidation,
@@ -19,40 +17,42 @@ import {
 
 const router = Router();
 
-// @route   POST /orders
-// @desc    Create a new order
-// @access  Private
-
+/**
+ * @route   POST /orders
+ * @description Create a new order for the authenticated user
+ * @access  Private
+ */
 router.post(
   "/",
-  authenticateToken,
+  authenticate,
   createOrderValidation,
   handleValidationErrors,
   createOrder
 );
 
-// @route   GET /orders
-// @desc    Retrieve all orders for the authenticated user
-// @access  Private
+/**
+ * @route   GET /orders
+ * @description Retrieve all orders for the authenticated user
+ * @access  Private
+ */
+router.get("/", authenticate, getUserOrders);
 
-router.get("/", authenticateToken, getUserOrders);
-
-// @route   GET /orders/:id
-// @desc    Retrieve a specific order by ID
-// @access  Private (User or Admin)
-
-router.get("/:id", authenticateToken, getOrderById);
+/**
+ * @route   GET /orders/:id
+ * @description Retrieve a specific order by its ID
+ * @access  Private (User or Admin)
+ */
+router.get("/:id", authenticate, getOrderById);
 
 /**
  * @route   PUT /orders/:id/status
- * @desc    Update the status of a specific order
+ * @description Update the status of a specific order (Admin only)
  * @access  Private (Admin only)
  */
-
 router.put(
   "/:id/status",
-  authenticateToken,
-  authorizeAdmin,
+  authenticate,
+  authorize("ADMIN"),
   updateOrderStatusValidation,
   handleValidationErrors,
   updateOrderStatus
@@ -60,14 +60,13 @@ router.put(
 
 /**
  * @route   DELETE /orders/:id
- * @desc    Delete a specific order
+ * @description Delete a specific order (Admin only)
  * @access  Private (Admin only)
  */
-
 router.delete(
   "/:id",
-  authenticateToken,
-  authorizeAdmin,
+  authenticate,
+  authorize("ADMIN"),
   deleteOrderValidator,
   handleValidationErrors,
   deleteOrder
