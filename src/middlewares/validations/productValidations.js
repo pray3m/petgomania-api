@@ -14,8 +14,15 @@ export const getAllProductsValidator = [
     .optional()
     .isString()
     .withMessage("Category must be a string.")
-    .isIn(ProductCategory)
-    .withMessage("Invalid category field"),
+    .custom((value) => {
+      const categories = value.split(",").map((cat) => cat.trim());
+      for (const category of categories) {
+        if (!Object.values(ProductCategory).includes(category)) {
+          throw new Error(`Invalid category: ${category}`);
+        }
+      }
+      return true; // If all categories are valid, return true
+    }),
   query("sortBy")
     .optional()
     .isIn(["name", "price", "createdAt", "updatedAt"])

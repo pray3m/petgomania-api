@@ -58,6 +58,7 @@ router.put(
   updateOrderStatus
 );
 
+// Admin only routes
 /**
  * @route   DELETE /orders/:id
  * @description Delete a specific order (Admin only)

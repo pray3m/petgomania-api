@@ -7,10 +7,17 @@ const errorHandler = (err, req, res, next) => {
   const message =
     err instanceof AppError ? err.message : "Internal Server Error";
 
-  res.status(statusCode).json({
+  const response = {
     status: "error",
     message,
-  });
+  };
+
+  // Include additional details if available
+  if (err instanceof AppError && err.details) {
+    response.details = err.details; // Include detailed error info if it's an AppError
+  }
+
+  res.status(statusCode).json(response);
 };
 
 export default errorHandler;

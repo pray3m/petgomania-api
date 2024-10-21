@@ -4,6 +4,7 @@ import authRoutes from "./authRoutes.js";
 import orderRoutes from "./orderRoutes.js";
 import paymentRoutes from "./paymentRoutes.js";
 import petRoutes from "./petRoutes.js";
+import checkoutRoutes from "./checkoutRoutes.js";
 
 const router = Router();
 
@@ -13,6 +14,7 @@ router.get("/ping", (req, res) => {
 
 router.use("/auth", authRoutes);
 router.use("/products", productRoutes);
+router.use("/checkout", checkoutRoutes);
 router.use("/orders", orderRoutes);
 router.use("/payments", paymentRoutes);
 router.use("/pets", petRoutes);

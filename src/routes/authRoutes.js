@@ -55,4 +55,6 @@ router.post(
  */
 router.post("/login", [...loginValidator, handleValidationErrors], login);
 
+// TODO : forgot password, reset password API routes
+
 export default router;
