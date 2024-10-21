@@ -1,7 +1,7 @@
+import { ProductCategory } from "@prisma/client";
 import cloudinary from "../config/cloudinary.js";
 import prisma from "../config/db.js";
 import AppError from "../utils/AppError.js";
-import { allowedCategories } from "../utils/constants.js";
 import { handleServiceError } from "../utils/handleServiceError.js";
 import { extractPublicId } from "../utils/helpers.js";
 
@@ -87,6 +87,46 @@ export const getAllProductsService = async ({
     };
   } catch (error) {
     handleServiceError(error, "Get Products Error");
+  }
+};
+
+export const searchProductsService = async ({
+  query,
+  page = 1,
+  limit = 10,
+}) => {
+  const skip = (page - 1) * limit;
+
+  const where = {
+    OR: [{ name: { contains: query } }, { description: { contains: query } }],
+  };
+
+  try {
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: {
+          createdAt: "desc", // adjust sorting
+        },
+      }),
+      prisma.product.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      products,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+    };
+  } catch (error) {
+    handleServiceError(error, "searching products");
   }
 };
 

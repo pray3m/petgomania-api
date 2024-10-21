@@ -3,6 +3,7 @@ import {
   deleteProductService,
   getAllProductsService,
   getProductByIdService,
+  searchProductsService,
   updateProductService,
 } from "../services/productService.js";
 
@@ -50,6 +51,25 @@ export const getAllProducts = async (req, res, next) => {
       search,
     });
 
+    res.status(200).json({
+      status: "success",
+      message: "Products retrieved successfully",
+      products: result.products,
+      meta: result.meta,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const searchProducts = async (req, res, next) => {
+  const { query, page, limit } = req.query;
+  try {
+    const result = await searchProductsService({
+      query,
+      page: parseInt(page) || 1,
+      limit: parseInt(limit) || 10,
+    });
     res.status(200).json({
       status: "success",
       message: "Products retrieved successfully",

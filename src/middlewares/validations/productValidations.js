@@ -27,6 +27,22 @@ export const getAllProductsValidator = [
   query("search").optional().isString().withMessage("Search must be a string."),
 ];
 
+export const searchProductsValidator = [
+  query("query")
+    .notEmpty()
+    .withMessage("Search query is required.")
+    .isString()
+    .withMessage("Search query must be a string."),
+  query("page")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("Page must be a positive integer."),
+  query("limit")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("Limit must be a positive integer."),
+];
+
 export const createProductValidator = [
   body("name").trim().notEmpty().withMessage("Product name is required."),
   body("description")

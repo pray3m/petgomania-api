@@ -4,6 +4,7 @@ import {
   deleteProduct,
   getAllProducts,
   getProductById,
+  searchProducts,
   updateProduct,
 } from "../controllers/productController.js";
 import { authenticate } from "../middlewares/auth.js";
@@ -15,6 +16,7 @@ import {
   deleteProductValidator,
   getAllProductsValidator,
   getProductByIdValidator,
+  searchProductsValidator,
   updateProductValidator,
 } from "../middlewares/validations/productValidations.js";
 
@@ -22,13 +24,24 @@ const router = Router();
 
 /**
  * @route GET /products
- * @description Get all products with optional filters (pagination, sorting, category, search)
+ * @description Get all products with optional filters (pagination, sorting, category,search)
  * @access Public
  */
 router.get(
   "/",
   [...getAllProductsValidator, handleValidationErrors],
   getAllProducts
+);
+
+/**
+ * @route GET /products/search
+ * @description Search products based on query
+ *  @access  Public
+ */
+router.get(
+  "/search",
+  [...searchProductsValidator, handleValidationErrors],
+  searchProducts
 );
 
 /**
