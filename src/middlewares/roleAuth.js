@@ -47,6 +47,6 @@ export const authorize = (roles) => {
  */
 export const checkOwnerOrAdmin = (resourceUserId, userId, userRole) => {
   if (resourceUserId !== userId && userRole !== "ADMIN") {
-    throw new AppError(403, "Unauthorized: You can only delete your own pets.");
+    throw new AppError(403, "Unauthorized: You can only manage your own pets.");
   }
 };

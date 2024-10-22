@@ -5,10 +5,18 @@ import {
   getAllPets,
   getPetById,
   getPetsByUserId,
+  updatePetStatus,
 } from "../controllers/petController.js";
 import { petUpload } from "../middlewares/upload.js";
 import { handleValidationErrors } from "../middlewares/validations/handleValidationErrors.js";
-import { createPetValidator } from "../middlewares/validations/petValidations.js";
+import {
+  createPetValidator,
+  deletePetValidator,
+  getAllPetsValidator,
+  getPetByIdValidator,
+  getPetsByUserIdValidator,
+  updatePetStatusValidator,
+} from "../middlewares/validations/petValidations.js";
 import { authenticate } from "../middlewares/auth.js";
 
 const router = Router();
@@ -18,29 +26,29 @@ const router = Router();
  * @description Retrieve all pets with optional filters
  * @access Public
  */
-
-router.get("/", getAllPets);
+router.get("/", [...getAllPetsValidator, handleValidationErrors], getAllPets);
 
 /**
  * @route GET /pets/:id
  * @description Retrieve a pet by ID
  * @access Public
  */
-
-router.get("/:id", getPetById);
+router.get(
+  "/:id",
+  [...getPetByIdValidator, handleValidationErrors],
+  getPetById
+);
 
 /**
  * @route POST /pets
  * @description Create a new pet
  * @access Private
  */
-
 router.post(
   "/",
   authenticate,
   petUpload.single("image"),
-  createPetValidator,
-  handleValidationErrors,
+  [...createPetValidator, handleValidationErrors],
   createPet
 );
 
@@ -49,15 +57,29 @@ router.post(
  * @description Retrieve all pets listed by a specific user
  * @access Public
  */
+router.get(
+  "/users/:userId",
+  [...getPetsByUserIdValidator, handleValidationErrors],
+  getPetsByUserId
+);
 
-router.get("/users/:userId", getPetsByUserId);
+/**
+ * @route PATCH /pets/:id/status
+ * @description Update a pet's status
+ * @access Private
+ */
+router.patch(
+  "/:id/status",
+  authenticate,
+  [...updatePetStatusValidator, handleValidationErrors],
+  updatePetStatus
+);
 
 /**
  * @route PUT /pets/:id
  * @description Update a pet's information
  * @access Private
  */
-
 // router.put("/:id", updatePet);
 
 /**
@@ -65,7 +87,11 @@ router.get("/users/:userId", getPetsByUserId);
  * @description Delete a pet by ID
  * @access Owner or Admin
  */
-
-router.delete("/:id", authenticate, deletePet);
+router.delete(
+  "/:id",
+  authenticate,
+  [...deletePetValidator, handleValidationErrors],
+  deletePet
+);
 
 export default router;

@@ -4,6 +4,7 @@ import {
   getAllPetsService,
   getPetByIdService,
   getPetsByUserIdService,
+  updatePetStatusService,
 } from "../services/petService.js";
 
 export const getAllPets = async (req, res, next) => {
@@ -81,15 +82,34 @@ export const getPetsByUserId = async (req, res, next) => {
   }
 };
 
+export const updatePetStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const userId = req.user.id;
+    const userRole = req.user.role;
+    const { message } = await updatePetStatusService(
+      id,
+      status,
+      userId,
+      userRole
+    );
+    res.status(200).json({
+      status: "success",
+      message,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deletePet = async (req, res, next) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
     const userRole = req.user.role;
-    await deletePetService(id, userId, userRole);
-    res
-      .status(200)
-      .json({ status: "success", message: "Pet deleted successfully." });
+    const { message } = await deletePetService(id, userId, userRole);
+    res.status(200).json({ status: "success", message });
   } catch (error) {
     next(error);
   }

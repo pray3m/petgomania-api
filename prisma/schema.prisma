@@ -26,6 +26,12 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum PetStatus {
+  AVAILABLE
+  PENDING
+  ADOPTED
+}
+
 enum AdoptionStatus {
   PENDING
   APPROVED
@@ -101,6 +107,7 @@ model Pet {
   breed        String
   age          Int
   gender       PetGender
+  status       PetStatus        @default(AVAILABLE)
   healthStatus PetHealthStatus?
   description  String
   location     String
