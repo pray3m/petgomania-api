@@ -38,6 +38,7 @@ CREATE TABLE `Pet` (
     `breed` VARCHAR(191) NOT NULL,
     `age` INTEGER NOT NULL,
     `gender` ENUM('MALE', 'FEMALE', 'UNKNOWN') NOT NULL,
+    `status` ENUM('AVAILABLE', 'PENDING', 'ADOPTED') NOT NULL DEFAULT 'AVAILABLE',
     `healthStatus` ENUM('HEALTHY', 'SICK', 'RECOVERING') NULL,
     `description` VARCHAR(191) NOT NULL,
     `location` VARCHAR(191) NOT NULL,
@@ -47,6 +48,8 @@ CREATE TABLE `Pet` (
     `userId` INTEGER NOT NULL,
 
     INDEX `Pet_breed_idx`(`breed`),
+    INDEX `Pet_userId_idx`(`userId`),
+    INDEX `Pet_status_idx`(`status`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -80,21 +83,6 @@ CREATE TABLE `OrderItem` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Adoption` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `status` ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
-    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updatedAt` DATETIME(3) NOT NULL,
-    `petId` INTEGER NOT NULL,
-    `adopterId` INTEGER NOT NULL,
-
-    INDEX `Adoption_petId_idx`(`petId`),
-    INDEX `Adoption_adopterId_idx`(`adopterId`),
-    UNIQUE INDEX `Adoption_petId_adopterId_key`(`petId`, `adopterId`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `Message` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `content` VARCHAR(191) NOT NULL,
@@ -115,9 +103,11 @@ CREATE TABLE `Conversation` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `user1Id` INTEGER NOT NULL,
     `user2Id` INTEGER NOT NULL,
+    `petId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
-    UNIQUE INDEX `Conversation_user1Id_user2Id_key`(`user1Id`, `user2Id`),
+    INDEX `Conversation_petId_idx`(`petId`),
+    UNIQUE INDEX `Conversation_user1Id_user2Id_petId_key`(`user1Id`, `user2Id`, `petId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -137,12 +127,6 @@ ALTER TABLE `OrderItem` ADD CONSTRAINT `OrderItem_orderId_fkey` FOREIGN KEY (`or
 ALTER TABLE `OrderItem` ADD CONSTRAINT `OrderItem_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Adoption` ADD CONSTRAINT `Adoption_petId_fkey` FOREIGN KEY (`petId`) REFERENCES `Pet`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Adoption` ADD CONSTRAINT `Adoption_adopterId_fkey` FOREIGN KEY (`adopterId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `Message` ADD CONSTRAINT `Message_senderId_fkey` FOREIGN KEY (`senderId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -156,3 +140,6 @@ ALTER TABLE `Conversation` ADD CONSTRAINT `Conversation_user1Id_fkey` FOREIGN KE
 
 -- AddForeignKey
 ALTER TABLE `Conversation` ADD CONSTRAINT `Conversation_user2Id_fkey` FOREIGN KEY (`user2Id`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Conversation` ADD CONSTRAINT `Conversation_petId_fkey` FOREIGN KEY (`petId`) REFERENCES `Pet`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

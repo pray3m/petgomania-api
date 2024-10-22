@@ -32,11 +32,11 @@ enum PetStatus {
   ADOPTED
 }
 
-enum AdoptionStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
+// enum AdoptionStatus {
+//   PENDING
+//   APPROVED
+//   REJECTED
+// }
 
 enum PetGender {
   MALE
@@ -74,7 +74,7 @@ model User {
   // Relationships
   pets               Pet[]
   orders             Order[]
-  adoptions          Adoption[]
+  // adoptions          Adoption[] // TODO : Remove this model
   sentMessages       Message[]      @relation("SentMessages")
   receivedMessages   Message[]      @relation("ReceivedMessages")
   userConversations1 Conversation[] @relation("User1Conversations")
@@ -116,11 +116,13 @@ model Pet {
   updatedAt    DateTime         @updatedAt
 
   // Relationships
-  userId    Int
-  user      User       @relation(fields: [userId], references: [id])
-  adoptions Adoption[]
+  userId       Int
+  user         User           @relation(fields: [userId], references: [id])
+  Conversation Conversation[]
 
   @@index([breed])
+  @@index([userId])
+  @@index([status])
 }
 
 // 4. Order Model
@@ -158,23 +160,23 @@ model OrderItem {
   @@index([productId])
 }
 
-// 5. Adoption Model
-model Adoption {
-  id        Int            @id @default(autoincrement())
-  status    AdoptionStatus @default(PENDING) // 'pending', 'approved', 'rejected'
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+// // 5. Adoption Model
+// model Adoption {
+//   id        Int            @id @default(autoincrement())
+//   status    AdoptionStatus @default(PENDING) // 'pending', 'approved', 'rejected'
+//   createdAt DateTime       @default(now())
+//   updatedAt DateTime       @updatedAt
 
-  // Relationships
-  petId     Int
-  adopterId Int
-  pet       Pet  @relation(fields: [petId], references: [id])
-  adopter   User @relation(fields: [adopterId], references: [id])
+//   // Relationships
+//   petId     Int
+//   adopterId Int
+//   pet       Pet  @relation(fields: [petId], references: [id])
+//   adopter   User @relation(fields: [adopterId], references: [id])
 
-  @@unique([petId, adopterId])
-  @@index([petId])
-  @@index([adopterId])
-}
+//   @@unique([petId, adopterId])
+//   @@index([petId])
+//   @@index([adopterId])
+// }
 
 // 6. Message Model
 model Message {
@@ -201,12 +203,15 @@ model Conversation {
   id        Int      @id @default(autoincrement())
   user1Id   Int
   user2Id   Int
+  petId     Int
   createdAt DateTime @default(now())
 
   // Relationships
   user1    User      @relation("User1Conversations", fields: [user1Id], references: [id])
   user2    User      @relation("User2Conversations", fields: [user2Id], references: [id])
+  pet      Pet       @relation(fields: [petId], references: [id])
   messages Message[]
 
-  @@unique([user1Id, user2Id])
+  @@unique([user1Id, user2Id, petId])
+  @@index([petId])
 }
