@@ -2,6 +2,7 @@ import {
   createConversation,
   getConversationMessages,
   getConversations,
+  sendMessage,
 } from "../services/conversationService.js";
 import { AppError } from "../utils/index.js";
 
@@ -37,6 +38,19 @@ export const getConversationMessagesHandler = async (req, res, next) => {
 
     const messages = await getConversationMessages(parseInt(id, 10), userId);
     res.status(201).json(messages);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const sendMessageHandler = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { content } = req.body;
+    const userId = req.user.id;
+
+    const message = await sendMessage(parseInt(id, 10), userId, content);
+    res.status(201).json(message);
   } catch (error) {
     next(error);
   }

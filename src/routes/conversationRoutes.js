@@ -3,13 +3,15 @@ import {
   createConversationHandler,
   getConversationMessagesHandler,
   getConversationsHandler,
+  sendMessageHandler,
 } from "../controllers/conversationController.js";
 import { authenticate } from "../middlewares/auth.js";
-import { handleValidationErrors } from "../middlewares/validations/handleValidationErrors.js";
 import {
   createConversationValidator,
   getConversationMessagesValidator,
+  sendMessageValidator,
 } from "../middlewares/validations/conversationValidations.js";
+import { handleValidationErrors } from "../middlewares/validations/handleValidationErrors.js";
 
 const router = Router();
 
@@ -42,6 +44,18 @@ router.get(
   authenticate,
   [...getConversationMessagesValidator, handleValidationErrors],
   getConversationMessagesHandler
+);
+
+/**
+ * @route POST conversations/:id/messages
+ * @description Send the messages
+ * @access Private
+ */
+router.post(
+  "/:id/messages",
+  authenticate,
+  [...sendMessageValidator, handleValidationErrors],
+  sendMessageHandler
 );
 
 export default router;

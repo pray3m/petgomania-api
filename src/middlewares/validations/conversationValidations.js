@@ -17,3 +17,13 @@ export const createConversationValidator = [
 export const getConversationMessagesValidator = [
   param("id").isInt({ gt: 0 }).withMessage("Invalid conversation ID"),
 ];
+
+export const sendMessageValidator = [
+  param("id").isInt({ gt: 0 }).withMessage("Invalid conversation ID"),
+  body("content")
+    .trim()
+    .notEmpty()
+    .withMessage("Message is required")
+    .isString()
+    .withMessage("Invalid message content"),
+];

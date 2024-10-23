@@ -1,4 +1,5 @@
 import { AppError, handleServiceError, prisma } from "../utils/index.js";
+import { getIO } from "./socketService.js";
 
 export const createConversation = async (userId, ownerId, petId) => {
   try {
@@ -135,5 +136,61 @@ export const getConversationMessages = async (conversationId, userId) => {
     return conversation.messages;
   } catch (error) {
     handleServiceError(error, "fetching messages");
+  }
+};
+
+export const sendMessage = async (conversationId, senderId, content) => {
+  try {
+    const conversation = await prisma.conversation.findUnique({
+      where: { id: conversationId },
+      include: {
+        user1: true,
+        user2: true,
+      },
+    });
+
+    if (!conversation) {
+      throw new AppError(404, "Conversation not found!");
+    }
+
+    if (
+      conversation.user1Id !== senderId &&
+      conversation.user2Id !== senderId
+    ) {
+      throw new AppError(
+        403,
+        "You are not authorized to send messages in this conversation!"
+      );
+    }
+
+    const receiverId =
+      conversation.user1Id === senderId
+        ? conversation.user2Id
+        : conversation.user1Id;
+
+    const message = await prisma.message.create({
+      data: {
+        content,
+        senderId,
+        receiverId,
+        conversationId,
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    // Emit the messsage to all users in the conversation room
+    const io = getIO();
+    io.to(`conversation_${conversationId}`).emit("new_message", message);
+
+    return message;
+  } catch (error) {
+    handleServiceError(error, "sending message");
   }
 };

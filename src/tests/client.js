@@ -14,7 +14,7 @@ socket.on("connect", () => {
   // Send a message
   socket.emit("send_message", {
     conversationId: 1,
-   message: "Hello! Is your pet still available for adoption?",
+    message: "Hello! Is your pet still available for adoption?",
   });
 
   // Listen for new messages
@@ -24,11 +24,11 @@ socket.on("connect", () => {
   });
 
   // Leave the conversation after 10 seconds
-  setTimeout(() => {
-    socket.emit("leave_conversation", 1);
-    console.log("Left conversation 1");
-    socket.disconnect();
-  }, 10000);
+  // setTimeout(() => {
+  //   socket.emit("leave_conversation", 1);
+  //   console.log("Left conversation 1");
+  //   socket.disconnect();
+  // }, 10000);
 });
 
 socket.on("disconnect", () => {
