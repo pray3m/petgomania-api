@@ -19,14 +19,14 @@ export const initializeSocket = (server) => {
       console.log(`User joined conversation: ${conversationId}`);
     });
 
-    // handle new message event
-    socket.on("send_message", async ({ conversationId, message }) => {
-      // save the message to the db
-      console.log(`New message: ${message}`);
+    // // handle new message event
+    // socket.on("send_message", async ({ conversationId, message }) => {
+    //   // save the message to the db
+    //   console.log(`New message: ${message}`);
 
-      // broadcast the message to all users in the conversation
-      io.to(`conversation_${conversationId}`).emit("new_message", message);
-    });
+    //   // broadcast the message to all users in the conversation
+    //   io.to(`conversation_${conversationId}`).emit("new_message", message);
+    // });
 
     // leave a conversation room
     socket.on("leave_conversation", (conversationId) => {
@@ -38,6 +38,8 @@ export const initializeSocket = (server) => {
       console.log("User disconnected", socket.id);
     });
   });
+
+  return io;
 };
 
 export const getIO = () => {

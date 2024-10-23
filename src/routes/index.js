@@ -5,6 +5,7 @@ import orderRoutes from "./orderRoutes.js";
 import paymentRoutes from "./paymentRoutes.js";
 import petRoutes from "./petRoutes.js";
 import checkoutRoutes from "./checkoutRoutes.js";
+import conversationRoutes from "./conversationRoutes.js";
 
 const router = Router();
 
@@ -26,5 +27,6 @@ GET    /api/conversations                   - List all conversations
 GET    /api/conversations/:id/messages      - Get conversation messages
  */
 
+router.use("/conversations", conversationRoutes);
 
 export default router;
