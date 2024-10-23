@@ -111,3 +111,29 @@ export const getConversations = async (userId) => {
     handleServiceError(error, "fetching conversations");
   }
 };
+
+export const getConversationMessages = async (conversationId, userId) => {
+  try {
+    const conversation = await prisma.conversation.findFirst({
+      where: {
+        id: conversationId,
+        OR: [{ user1Id: userId }, { user2Id: userId }],
+      },
+      include: {
+        messages: {
+          orderBy: {
+            createdAt: "asc",
+          },
+        },
+      },
+    });
+
+    if (!conversation) {
+      throw new AppError(404, "Conversation not found");
+    }
+
+    return conversation.messages;
+  } catch (error) {
+    handleServiceError(error, "fetching messages");
+  }
+};

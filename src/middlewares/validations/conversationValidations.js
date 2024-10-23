@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 
 export const createConversationValidator = [
   body("petId")
@@ -12,4 +12,8 @@ export const createConversationValidator = [
     .withMessage("Pet OwnerId is required")
     .isInt({ gt: 0 })
     .withMessage("Invalid pet ownerId"),
+];
+
+export const getConversationMessagesValidator = [
+  param("id").isInt({ gt: 0 }).withMessage("Invalid conversation ID"),
 ];
