@@ -116,9 +116,9 @@ model Pet {
   updatedAt    DateTime         @updatedAt
 
   // Relationships
-  userId       Int
-  user         User           @relation(fields: [userId], references: [id])
-  Conversation Conversation[]
+  userId        Int
+  user          User           @relation(fields: [userId], references: [id])
+  conversations Conversation[]
 
   @@index([breed])
   @@index([userId])
@@ -201,8 +201,8 @@ model Message {
 // 7. Conversation Model
 model Conversation {
   id        Int      @id @default(autoincrement())
-  user1Id   Int
-  user2Id   Int
+  user1Id   Int // Interested party
+  user2Id   Int // Pet owner
   petId     Int
   createdAt DateTime @default(now())
 

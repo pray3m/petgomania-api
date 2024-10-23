@@ -18,9 +18,6 @@ router.use("/checkout", checkoutRoutes);
 router.use("/orders", orderRoutes);
 router.use("/payments", paymentRoutes);
 
-/*
- * POST   /api/pets/:id/adopt         // Submit adoption request
- */
 router.use("/pets", petRoutes);
 
 /**
@@ -28,5 +25,6 @@ POST    /api/conversations                  - Create  conversations
 GET    /api/conversations                   - List all conversations
 GET    /api/conversations/:id/messages      - Get conversation messages
  */
+
 
 export default router;
