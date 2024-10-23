@@ -1,4 +1,4 @@
-import { createConversation } from "../services/conversationService";
+import { createConversation } from "../services/conversationService.js";
 import { AppError } from "../utils/index.js";
 
 export const createConversationHandler = async (req, res, next) => {

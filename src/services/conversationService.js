@@ -1,13 +1,51 @@
-import { handleServiceError, prisma } from "../utils/index.js";
+import { AppError, handleServiceError, prisma } from "../utils/index.js";
 
-export const createConversation = async (user1Id, user2Id, petId) => {
+export const createConversation = async (userId, ownerId, petId) => {
   try {
+    const pet = await prisma.pet.findUnique({
+      where: { id: petId },
+    });
+
+    if (!pet) {
+      throw new AppError(404, `Pet with ID ${petId} is not available.`);
+    }
+
+    if (pet.userId !== ownerId) {
+      throw new AppError(
+        404,
+        `Pet with ID ${petId} is not owned by this user.`
+      );
+    }
+
+    const include = {
+      user1: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      user2: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      pet: {
+        select: {
+          id: true,
+          name: true,
+          imageUrl: true,
+        },
+      },
+    };
+
     const existingConversation = await prisma.conversation.findFirst({
       where: {
-        user1Id,
-        user2Id,
+        user1Id: userId,
+        user2Id: ownerId,
         petId,
       },
+      include,
     });
 
     if (existingConversation) {
@@ -16,31 +54,11 @@ export const createConversation = async (user1Id, user2Id, petId) => {
 
     const newConversation = await prisma.conversation.create({
       data: {
-        user1Id,
-        user2Id,
+        user1Id: userId,
+        user2Id: ownerId,
         petId,
       },
-      include: {
-        user1: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        user2: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        pet: {
-          select: {
-            id: true,
-            name: true,
-            imageUrl: true,
-          },
-        },
-      },
+      include,
     });
 
     return newConversation;

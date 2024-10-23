@@ -19,6 +19,7 @@ socket.on("connect", () => {
 
   // Listen for new messages
   socket.on("new_message", (message) => {
+    // Update the UI with the new message
     console.log("New message received:", message);
   });
 

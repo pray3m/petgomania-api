@@ -21,12 +21,6 @@ router.use("/payments", paymentRoutes);
 
 router.use("/pets", petRoutes);
 
-/**
-POST    /api/conversations                  - Create  conversations
-GET    /api/conversations                   - List all conversations
-GET    /api/conversations/:id/messages      - Get conversation messages
- */
-
 router.use("/conversations", conversationRoutes);
 
 export default router;
