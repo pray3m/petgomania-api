@@ -1,4 +1,7 @@
-import { createConversation } from "../services/conversationService.js";
+import {
+  createConversation,
+  getConversations,
+} from "../services/conversationService.js";
 import { AppError } from "../utils/index.js";
 
 export const createConversationHandler = async (req, res, next) => {
@@ -11,6 +14,16 @@ export const createConversationHandler = async (req, res, next) => {
     }
     const conversation = await createConversation(userId, ownerId, petId);
     res.status(201).json(conversation);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getConversationsHandler = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const conversations = await getConversations(userId);
+    res.status(201).json(conversations);
   } catch (error) {
     next(error);
   }

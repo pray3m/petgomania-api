@@ -66,3 +66,48 @@ export const createConversation = async (userId, ownerId, petId) => {
     handleServiceError(error, "creating conversation");
   }
 };
+
+export const getConversations = async (userId) => {
+  try {
+    return await prisma.conversation.findMany({
+      where: {
+        OR: [{ user1Id: userId }, { user2Id: userId }],
+      },
+      include: {
+        user1: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        user2: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        pet: {
+          select: {
+            id: true,
+            name: true,
+            imageUrl: true,
+            status: true,
+          },
+        },
+        messages: {
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 1,
+        },
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+  } catch (error) {
+    handleServiceError(error, "fetching conversations");
+  }
+};

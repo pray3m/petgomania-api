@@ -105,6 +105,7 @@ CREATE TABLE `Conversation` (
     `user2Id` INTEGER NOT NULL,
     `petId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
 
     INDEX `Conversation_petId_idx`(`petId`),
     UNIQUE INDEX `Conversation_user1Id_user2Id_petId_key`(`user1Id`, `user2Id`, `petId`),
