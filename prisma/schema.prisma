@@ -26,30 +26,6 @@ enum OrderStatus {
   CANCELLED
 }
 
-enum PetStatus {
-  AVAILABLE
-  PENDING
-  ADOPTED
-}
-
-// enum AdoptionStatus {
-//   PENDING
-//   APPROVED
-//   REJECTED
-// }
-
-enum PetGender {
-  MALE
-  FEMALE
-  UNKNOWN
-}
-
-enum PetHealthStatus {
-  HEALTHY
-  SICK
-  RECOVERING
-}
-
 enum ProductCategory {
   food
   toys
@@ -58,7 +34,6 @@ enum ProductCategory {
   grooming
 }
 
-// 1. User Model
 model User {
   id           Int       @id @default(autoincrement())
   name         String
@@ -71,7 +46,6 @@ model User {
   otpAttempts  Int?      @default(0)
   createdAt    DateTime  @default(now())
 
-  // Relationships
   pets               Pet[]
   orders             Order[]
   // adoptions          Adoption[] // TODO : Remove this model
@@ -83,7 +57,7 @@ model User {
   @@index([email])
 }
 
-// 2. Product Model
+// Pet Store E-Commerce
 model Product {
   id          Int             @id @default(autoincrement())
   name        String
@@ -95,37 +69,10 @@ model Product {
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
 
-  // Relationships
   orders    Order[]
   OrderItem OrderItem[]
 }
 
-// 3. Pet Model
-model Pet {
-  id           Int              @id @default(autoincrement())
-  name         String
-  breed        String
-  age          Int
-  gender       PetGender
-  status       PetStatus        @default(AVAILABLE)
-  healthStatus PetHealthStatus?
-  description  String
-  location     String
-  imageUrl     String?
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
-
-  // Relationships
-  userId        Int
-  user          User           @relation(fields: [userId], references: [id])
-  conversations Conversation[]
-
-  @@index([breed])
-  @@index([userId])
-  @@index([status])
-}
-
-// 4. Order Model
 model Order {
   id         Int         @id @default(autoincrement())
   totalPrice Float
@@ -133,7 +80,6 @@ model Order {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 
-  // Relationships
   userId     Int
   user       User        @relation(fields: [userId], references: [id])
   orderItems OrderItem[]
@@ -150,7 +96,6 @@ model OrderItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relationships
   orderId   Int
   productId Int
   order     Order   @relation(fields: [orderId], references: [id])
@@ -160,32 +105,55 @@ model OrderItem {
   @@index([productId])
 }
 
-// // 5. Adoption Model
-// model Adoption {
-//   id        Int            @id @default(autoincrement())
-//   status    AdoptionStatus @default(PENDING) // 'pending', 'approved', 'rejected'
-//   createdAt DateTime       @default(now())
-//   updatedAt DateTime       @updatedAt
+// Pet Adoption
 
-//   // Relationships
-//   petId     Int
-//   adopterId Int
-//   pet       Pet  @relation(fields: [petId], references: [id])
-//   adopter   User @relation(fields: [adopterId], references: [id])
+enum PetStatus {
+  AVAILABLE
+  PENDING
+  ADOPTED
+}
 
-//   @@unique([petId, adopterId])
-//   @@index([petId])
-//   @@index([adopterId])
-// }
+enum PetGender {
+  MALE
+  FEMALE
+  UNKNOWN
+}
 
-// 6. Message Model
+enum PetHealthStatus {
+  HEALTHY
+  SICK
+  RECOVERING
+}
+
+model Pet {
+  id           Int              @id @default(autoincrement())
+  name         String
+  breed        String
+  age          Int
+  gender       PetGender
+  status       PetStatus        @default(AVAILABLE)
+  healthStatus PetHealthStatus?
+  description  String
+  location     String
+  imageUrl     String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  userId        Int
+  user          User           @relation(fields: [userId], references: [id])
+  conversations Conversation[]
+
+  @@index([breed])
+  @@index([userId])
+  @@index([status])
+}
+
 model Message {
   id        Int      @id @default(autoincrement())
   content   String
   createdAt DateTime @default(now())
   isRead    Boolean  @default(false)
 
-  // Relationships
   senderId       Int
   receiverId     Int
   conversationId Int
@@ -198,7 +166,6 @@ model Message {
   @@index([conversationId])
 }
 
-// 7. Conversation Model
 model Conversation {
   id        Int      @id @default(autoincrement())
   user1Id   Int // Interested party
@@ -207,7 +174,6 @@ model Conversation {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relationships
   user1    User      @relation("User1Conversations", fields: [user1Id], references: [id])
   user2    User      @relation("User2Conversations", fields: [user2Id], references: [id])
   pet      Pet       @relation(fields: [petId], references: [id])
