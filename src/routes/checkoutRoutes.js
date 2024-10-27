@@ -7,6 +7,14 @@ import { validateCart } from "../controllers/checkoutController.js";
 const router = Router();
 
 /**
+ * @route POST /checkout
+ * @description Initiate checkout , create a new order , initiate payment
+ * @access Private
+ */
+
+router.post("/", createCheckout);
+
+/**
  * @route POST /checkout/validate-cart
  * @description Validate cart items, check stock and prices
  * @access Private
