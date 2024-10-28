@@ -1,4 +1,57 @@
+import { calculateTotalPrice, createOrderItems } from "../utils/helpers.js";
 import { AppError, handleServiceError, prisma } from "../utils/index.js"; // Ensure this path is correct
+
+export const initiateCheckoutService = async ({
+  userId,
+  cartItems,
+  shippingDetails,
+  paymentMethod,
+}) => {
+  try {
+    if (!cartItems || cartItems.length === 0) {
+      throw new AppError(400, "Cart is empty.");
+    }
+    if (!shippingDetails) {
+      throw new AppError(400, "Shipping details are required");
+    }
+
+    const totalPrice = await calculateTotalPrice(cartItems);
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    return await prisma.$transaction(async (tx) => {
+      const order = await tx.order.create({
+        data: {
+          userId,
+          totalPrice,
+          status: "PENDING",
+          orderItems: {
+            create: await createOrderItems(cartItems),
+          },
+          shippingAddress: {
+            create: {
+              ...shippingDetails,
+            },
+          },
+        },
+      });
+
+      const paymentForm = generatePaymentForm(order, user, shippingDetails); // TODO: Implement this function
+
+      const payment = await tx.payment.create({
+        data: {
+          payuOrderId: paymentResponse.payuOrderId,
+          state: "CREATED",
+          orderId: order.id,
+        },
+      });
+
+      return paymentForm;
+    });
+  } catch (error) {
+    handleServiceError(error, "initiating checkout");
+  }
+};
 
 export const validateCartService = async (items) => {
   let isValid = true;

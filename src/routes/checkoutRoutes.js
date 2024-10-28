@@ -1,8 +1,14 @@
 import { Router } from "express";
-import { validateCartValidator } from "../middlewares/validations/checkoutValidations.js";
-import { handleValidationErrors } from "../middlewares/validations/handleValidationErrors.js";
+import {
+  initiateCheckout,
+  validateCart,
+} from "../controllers/checkoutController.js";
 import { authenticate } from "../middlewares/auth.js";
-import { validateCart } from "../controllers/checkoutController.js";
+import {
+  checkoutValidator,
+  validateCartValidator,
+} from "../middlewares/validations/checkoutValidations.js";
+import { handleValidationErrors } from "../middlewares/validations/handleValidationErrors.js";
 
 const router = Router();
 
@@ -11,8 +17,12 @@ const router = Router();
  * @description Initiate checkout , create a new order , initiate payment
  * @access Private
  */
-
-router.post("/", createCheckout);
+router.post(
+  "/",
+  authenticate,
+  [...checkoutValidator, handleValidationErrors],
+  initiateCheckout
+);
 
 /**
  * @route POST /checkout/validate-cart
