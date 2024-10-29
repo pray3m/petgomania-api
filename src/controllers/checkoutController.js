@@ -8,14 +8,14 @@ export const initiateCheckout = async (req, res, next) => {
     const userId = req.user.id;
     const { cartItems, shippingDetails, paymentMethod } = req.body;
 
-    const { paymentUrl, orderId } = await initiateCheckoutService({
+    const { paymentUrl, formFields, orderId } = await initiateCheckoutService({
       userId,
       cartItems,
       shippingDetails,
       paymentMethod,
     });
 
-    res.status(200).json({ paymentUrl, orderId });
+    res.status(200).json({ paymentUrl, formFields, orderId });
   } catch (error) {
     next(error);
   }

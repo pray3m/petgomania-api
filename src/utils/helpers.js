@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { sendEmail } from "./emailService.js";
 import prisma from "../config/db.js";
 import AppError from "./AppError.js";
+import { response } from "express";
 
 export const generateOtp = () => {
   return crypto.randomInt(100000, 999999).toString();
@@ -98,8 +99,64 @@ export const createOrderItems = async (cartItems) => {
  * @desc    Initiate payment with PayULatam
  * @param   {Object} order - Order object
  */
-const generatePaymentForm = async (order, user, shippingDetails) => {
-  const { id, totalAmount } = order;
+export const generatePaymentForm = (order, user, shippingDetails) => {
+  const {
+    PAYU_API_KEY,
+    PAYU_MERCHANT_ID,
+    PAYU_ACCOUNT_ID,
+    PAYU_BASE_URL,
+    PAYU_TEST,
+  } = process.env;
 
-  const amount = tota;
+  if (
+    !PAYU_API_KEY ||
+    !PAYU_MERCHANT_ID ||
+    !PAYU_ACCOUNT_ID ||
+    !PAYU_BASE_URL
+  ) {
+    throw new AppError(500, "Payment configuration is incomplete.");
+  }
+
+  const { id, totalPrice } = order;
+  const amount = totalPrice.toFixed(2);
+  const currency = "COP";
+  const referenceCode = `ORDER-${id}`;
+
+  // calculate tax and tax return base
+  const tax = 0;
+  const taxReturnBase = 0;
+
+  // Generate signature
+  const signatureString = `${PAYU_API_KEY}~${PAYU_MERCHANT_ID}~${referenceCode}~${amount}~${currency}`;
+  const signature = crypto
+    .createHash("md5")
+    .update(signatureString)
+    .digest("hex");
+
+  // Prepare the form data
+  const formFields = {
+    merchantId: PAYU_MERCHANT_ID,
+    accountId: PAYU_ACCOUNT_ID,
+    description: `Order #${id} - Petgomania`,
+    referenceCode: referenceCode,
+    amount: amount,
+    tax: tax,
+    taxReturnBase: taxReturnBase,
+    currency: currency,
+    signature: signature,
+    test: PAYU_TEST === "true" ? "1" : "0",
+    buyerEmail: user.email,
+    responseUrl: `${PAYU_BASE_URL}/payments/response`,
+    confirmationUrl: `${PAYU_BASE_URL}/payments/webhook`,
+    shippingAddress: shippingDetails.addressLine1,
+    shippingCity: shippingDetails.city,
+    shippingCountry: shippingDetails.country,
+  };
+
+  const paymentUrl =
+    PAYU_TEST === "true"
+      ? "https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu/"
+      : "https://checkout.payulatam.com/ppp-web-gateway-payu/";
+
+  return { paymentUrl, formFields };
 };

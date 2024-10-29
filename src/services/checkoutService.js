@@ -1,5 +1,10 @@
-import { calculateTotalPrice, createOrderItems } from "../utils/helpers.js";
-import { AppError, handleServiceError, prisma } from "../utils/index.js"; // Ensure this path is correct
+import { log } from "console";
+import {
+  calculateTotalPrice,
+  createOrderItems,
+  generatePaymentForm,
+} from "../utils/helpers.js";
+import { AppError, handleServiceError, prisma } from "../utils/index.js";
 
 export const initiateCheckoutService = async ({
   userId,
@@ -19,7 +24,7 @@ export const initiateCheckoutService = async ({
 
     const user = await prisma.user.findUnique({ where: { id: userId } });
 
-    return await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       const order = await tx.order.create({
         data: {
           userId,
@@ -36,18 +41,27 @@ export const initiateCheckoutService = async ({
         },
       });
 
-      const paymentForm = generatePaymentForm(order, user, shippingDetails); // TODO: Implement this function
+      const { paymentUrl, formFields } = generatePaymentForm(
+        order,
+        user,
+        shippingDetails
+      );
+
+      log(paymentUrl);
+      log(formFields);
 
       const payment = await tx.payment.create({
         data: {
-          payuOrderId: paymentResponse.payuOrderId,
+          payuOrderId: formFields.referenceCode,
           state: "CREATED",
           orderId: order.id,
         },
       });
 
-      return paymentForm;
+      return { paymentUrl, formFields, orderId: order.id };
     });
+
+    return result;
   } catch (error) {
     handleServiceError(error, "initiating checkout");
   }

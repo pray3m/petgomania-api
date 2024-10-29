@@ -55,10 +55,10 @@ export const checkoutValidator = [
   body("shippingDetails.contactNumber")
     .notEmpty()
     .withMessage("Contact number is required."),
-  body("shippingDetails.email")
-    .isEmail()
-    .withMessage("Enter valid email")
-    .normalizeEmail(),
+  // body("shippingDetails.email")
+  //   .isEmail()
+  //   .withMessage("Enter valid email")
+  //   .normalizeEmail(),
 
   body("paymentMethod")
     .trim()
