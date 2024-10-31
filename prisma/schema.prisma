@@ -21,9 +21,10 @@ enum UserRole {
 
 enum OrderStatus {
   PENDING
-  SHIPPED
-  DELIVERED
+  PROCESSING
+  COMPLETED
   CANCELLED
+  REFUNDED
 }
 
 enum ProductCategory {

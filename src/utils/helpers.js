@@ -94,18 +94,29 @@ export const createOrderItems = async (cartItems) => {
 
   return orderItemsData;
 };
+// src/services/paymentService.js
 
 /**
- * @desc    Initiate payment with PayULatam
+ * @desc    Initiate payment with PayU Latam
  * @param   {Object} order - Order object
+ * @param   {Object} user - User object
+ * @param   {Object} shippingDetails - Shipping details
+ * @returns {Object} paymentUrl and formFields
+ */
+/**
+ * @desc    Initiate payment with PayU Latam
+ * @param   {Object} order - Order object
+ * @param   {Object} user - User object
+ * @param   {Object} shippingDetails - Shipping details
+ * @returns {Object} paymentUrl and formFields
  */
 export const generatePaymentForm = (order, user, shippingDetails) => {
   const {
     PAYU_API_KEY,
     PAYU_MERCHANT_ID,
     PAYU_ACCOUNT_ID,
-    PAYU_BASE_URL,
     PAYU_TEST,
+    PAYU_BASE_URL,
   } = process.env;
 
   if (
@@ -118,39 +129,45 @@ export const generatePaymentForm = (order, user, shippingDetails) => {
   }
 
   const { id, totalPrice } = order;
-  const amount = totalPrice.toFixed(2);
+  const amount = parseFloat(totalPrice).toFixed(2); // Ensure two decimal places
   const currency = "COP";
   const referenceCode = `ORDER-${id}`;
 
-  // calculate tax and tax return base
+  // Calculate tax and tax return base
   const tax = 0;
   const taxReturnBase = 0;
 
-  // Generate signature
+  // Generate signature using merchantId
   const signatureString = `${PAYU_API_KEY}~${PAYU_MERCHANT_ID}~${referenceCode}~${amount}~${currency}`;
   const signature = crypto
     .createHash("md5")
     .update(signatureString)
     .digest("hex");
 
-  // Prepare the form data
+  // Debugging logs
+  console.log("Generating Payment Form with:");
+  console.log("Signature String:", signatureString);
+  console.log("Generated Signature:", signature);
+
+  // Prepare the form data without leading/trailing spaces
   const formFields = {
     merchantId: PAYU_MERCHANT_ID,
     accountId: PAYU_ACCOUNT_ID,
     description: `Order #${id} - Petgomania`,
     referenceCode: referenceCode,
     amount: amount,
-    tax: tax,
-    taxReturnBase: taxReturnBase,
+    tax: tax.toString(),
+    taxReturnBase: taxReturnBase.toString(),
     currency: currency,
     signature: signature,
     test: PAYU_TEST === "true" ? "1" : "0",
     buyerEmail: user.email,
-    responseUrl: `${PAYU_BASE_URL}/payments/response`,
-    confirmationUrl: `${PAYU_BASE_URL}/payments/webhook`,
+    responseUrl: `${PAYU_BASE_URL}/response`,
+    confirmationUrl: `${PAYU_BASE_URL}/webhook`,
     shippingAddress: shippingDetails.addressLine1,
     shippingCity: shippingDetails.city,
     shippingCountry: shippingDetails.country,
+    // Add other fields if necessary
   };
 
   const paymentUrl =

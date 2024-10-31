@@ -1,12 +1,15 @@
 import { Router } from "express";
+import {
+  handlePaymentResponse,
+  handlePaymentWebhook,
+} from "../controllers/paymentController.js";
 
 const router = Router();
 
-// POST /payments/webhook
+router.get("/response", handlePaymentResponse);
 
-router.post("/webhook", (req, res) => {
-  res.send("Payments Route");
-});
+// POST /payments/webhook
+router.post("/webhook", handlePaymentWebhook);
 
 // GET /payments/status/:orderId
 // POST /payments/refund/:paymentId (admin only)
