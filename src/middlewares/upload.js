@@ -1,6 +1,7 @@
+import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../config/cloudinary.js";
-import multer from "multer";
+import { AppError } from "../utils/index.js";
 
 const UPLOAD_CONFIG = {
   ALLOWED_FORMATS: ["jpg", "jpeg", "png"],
@@ -40,7 +41,8 @@ const createParser = (storage) => {
       const ext = file.originalname.split(".").pop().toLowerCase();
       if (!UPLOAD_CONFIG.ALLOWED_FORMATS.includes(ext)) {
         return cb(
-          new Error(
+          new AppError(
+            400,
             `Only ${UPLOAD_CONFIG.ALLOWED_FORMATS.join(
               ", "
             )} files are allowed.`
@@ -55,4 +57,4 @@ const createParser = (storage) => {
 const productUpload = createParser(createCloudinaryStorage("products"));
 const petUpload = createParser(createCloudinaryStorage("pets"));
 
-export { productUpload, petUpload };
+export { petUpload, productUpload };
