@@ -79,10 +79,6 @@ export const getPetsByUserIdService = async (userId) => {
       orderBy: { createdAt: "desc" },
     });
 
-    if (!pets || pets.length === 0) {
-      throw new AppError(404, `No pets found for this user`);
-    }
-
     return pets;
   } catch (error) {
     handleServiceError(error, "retrieving pets by user id ");
