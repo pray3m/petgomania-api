@@ -2,31 +2,85 @@ import { checkOwnerOrAdmin } from "../middlewares/roleAuth.js";
 import { AppError, handleServiceError, prisma } from "../utils/index.js";
 
 export const getAllPetsService = async (filters) => {
-  const { breed, gender, status, healthStatus, page = 1, limit = 10 } = filters;
+  const {
+    breed,
+    gender,
+    status,
+    healthStatus,
+    page = 1,
+    limit = 10,
+    sortBy = "createdAt",
+    sortOrder = "desc",
+    search,
+  } = filters;
 
-  const where = {};
-  if (breed) where.breed = breed;
-  if (gender) where.gender = gender;
-  if (status) where.status = status;
-  if (healthStatus) where.healthStatus = healthStatus;
+  const where = {
+    AND: [
+      breed ? { breed } : {},
+      gender ? { gender } : {},
+      status ? { status } : {},
+      healthStatus ? { healthStatus } : {},
+      search
+        ? {
+            OR: [
+              { name: { contains: search, mode: "insensitive" } },
+              { description: { contains: search, mode: "insensitive" } },
+            ],
+          }
+        : {},
+    ],
+  };
+
+  const sortableFields = [
+    "name",
+    "breed",
+    "gender",
+    "status",
+    "healthStatus",
+    "createdAt",
+  ];
+  const orderBy = {};
+
+  if (sortableFields.includes(sortBy)) {
+    orderBy[sortBy] = sortOrder.toLowerCase() === "asc" ? "asc" : "desc";
+  } else {
+    // Default sorting
+    orderBy["createdAt"] = "desc";
+  }
 
   try {
-    const pets = await prisma.pet.findMany({
-      where,
-      skip: (page - 1) * limit,
-      take: parseInt(limit, 10),
-      orderBy: { createdAt: "desc" },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+    const [pets, total] = await Promise.all([
+      prisma.pet.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: parseInt(limit, 10),
+        orderBy,
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
           },
         },
+      }),
+      prisma.pet.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      pets,
+      meta: {
+        total,
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10),
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
       },
-    });
-    return pets;
+    };
   } catch (error) {
     handleServiceError(error, "retrieving pets");
   }

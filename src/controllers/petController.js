@@ -9,12 +9,36 @@ import {
 
 export const getAllPets = async (req, res, next) => {
   try {
-    const filters = req.query;
-    const pets = await getAllPetsService(filters);
+    const {
+      breed,
+      gender,
+      status,
+      healthStatus,
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+      search,
+    } = req.query;
+
+    const filters = {
+      breed,
+      gender,
+      status,
+      healthStatus,
+      page: parseInt(page, 10) || 1,
+      limit: parseInt(limit, 10) || 10,
+      sortBy,
+      sortOrder,
+      search,
+    };
+
+    const { pets, meta } = await getAllPetsService(filters);
     res.status(200).json({
       status: "success",
       message: "Pets retrieved successfully",
       pets,
+      meta,
     });
   } catch (error) {
     next(error);

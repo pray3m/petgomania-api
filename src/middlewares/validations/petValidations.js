@@ -33,6 +33,25 @@ export const getAllPetsValidator = [
     .optional()
     .isInt({ min: 1, max: 50 })
     .withMessage("Limit must be between 1 and 50"),
+
+  query("sortBy")
+    .optional()
+    .isIn(["name", "breed", "gender", "status", "healthStatus", "createdAt"])
+    .withMessage(
+      "Invalid sortBy field. Allowed fields are: name, breed, gender, status, healthStatus, createdAt"
+    ),
+
+  query("sortOrder")
+    .optional()
+    .isIn(["asc", "desc"])
+    .withMessage("sortOrder must be either 'asc' or 'desc'"),
+
+  query("search")
+    .optional()
+    .isString()
+    .trim()
+    .escape()
+    .withMessage("Search must be a valid string"),
 ];
 
 export const createPetValidator = [
